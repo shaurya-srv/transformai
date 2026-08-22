@@ -47,17 +47,17 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           <div
             key={t.id}
             className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border backdrop-blur-xl animate-toast-in",
-              t.type === "success" && "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
-              t.type === "error" && "bg-red-500/10 border-red-500/20 text-red-400",
-              t.type === "info" && "bg-violet-500/10 border-violet-500/20 text-violet-400"
+              "flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border backdrop-blur-sm animate-toast-in",
+              t.type === "success" && "bg-white border-emerald-200 text-emerald-700",
+              t.type === "error" && "bg-white border-red-200 text-red-600",
+              t.type === "info" && "bg-white border-blue-200 text-blue-600"
             )}
           >
             {t.type === "success" && <CheckCircle className="w-4 h-4 shrink-0" />}
             {t.type === "error" && <AlertCircle className="w-4 h-4 shrink-0" />}
             {t.type === "info" && <Info className="w-4 h-4 shrink-0" />}
             <span className="text-sm font-medium flex-1">{t.message}</span>
-            <button onClick={() => dismiss(t.id)} className="shrink-0 opacity-60 hover:opacity-100 transition-opacity">
+            <button onClick={() => dismiss(t.id)} className="shrink-0 opacity-40 hover:opacity-100 transition-opacity">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>

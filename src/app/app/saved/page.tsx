@@ -7,7 +7,6 @@ import {
   Copy,
   Download,
   Trash2,
-  ExternalLink,
   Video,
   Share2,
   FileText,
@@ -102,8 +101,8 @@ export default function SavedOutputsPage() {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-5xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Saved Outputs</h1>
-        <p className="text-sm text-text-secondary mt-1">
+        <h1 className="text-2xl font-bold text-gray-900">Saved Outputs</h1>
+        <p className="text-sm text-gray-500 mt-1">
           Your library of saved transformation outputs.
         </p>
       </div>
@@ -116,8 +115,8 @@ export default function SavedOutputsPage() {
             onClick={() => setActiveCategory(cat.id)}
             className={`px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
               activeCategory === cat.id
-                ? "bg-violet-500/15 text-violet-400 border border-violet-500/20"
-                : "bg-surface border border-white/5 text-text-tertiary hover:text-text-secondary"
+                ? "bg-blue-50 text-blue-700 border border-blue-200"
+                : "bg-white border border-gray-200 text-gray-400 hover:text-gray-600"
             }`}
           >
             {cat.label}
@@ -132,36 +131,36 @@ export default function SavedOutputsPage() {
           return (
             <div
               key={output.id}
-              className="glass rounded-xl p-5 hover:bg-card-hover transition-all group"
+              className="bg-white rounded-xl p-5 border border-gray-200 hover:border-blue-200 hover:shadow-md hover:shadow-blue-500/5 transition-all group"
             >
               <div className="flex items-start gap-3 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
-                  <Icon className="w-4 h-4 text-violet-400" />
+                <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+                  <Icon className="w-4 h-4 text-blue-500" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-white truncate">
+                  <h3 className="text-sm font-bold text-gray-900 truncate">
                     {output.title}
                   </h3>
-                  <p className="text-[10px] text-text-tertiary mt-0.5">
+                  <p className="text-[10px] text-gray-400 mt-0.5">
                     From: {output.source}
                   </p>
                 </div>
               </div>
 
-              <p className="text-xs text-text-secondary line-clamp-2 mb-4 leading-relaxed">
+              <p className="text-xs text-gray-500 line-clamp-2 mb-4 leading-relaxed">
                 {output.preview}
               </p>
 
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-text-tertiary">{output.saved}</span>
+                <span className="text-[10px] text-gray-400">{output.saved}</span>
                 <div className="flex items-center gap-1">
-                  <button className="p-1.5 rounded-lg text-text-tertiary hover:text-white hover:bg-white/[0.06] transition-colors">
+                  <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
                     <Copy className="w-3.5 h-3.5" />
                   </button>
-                  <button className="p-1.5 rounded-lg text-text-tertiary hover:text-white hover:bg-white/[0.06] transition-colors">
+                  <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
                     <Download className="w-3.5 h-3.5" />
                   </button>
-                  <button className="p-1.5 rounded-lg text-text-tertiary hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                  <button className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -173,14 +172,14 @@ export default function SavedOutputsPage() {
 
       {filtered.length === 0 && (
         <div className="text-center py-16">
-          <Star className="w-12 h-12 text-text-tertiary mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-white mb-2">No saved outputs</h3>
-          <p className="text-sm text-text-secondary mb-4">
+          <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-gray-900 mb-2">No saved outputs</h3>
+          <p className="text-sm text-gray-500 mb-4">
             Save outputs from your transformations to see them here.
           </p>
           <Link
             href="/app/transform"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white rounded-xl text-sm font-semibold transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/25"
           >
             <Wand2 className="w-4 h-4" />
             Start Transformation

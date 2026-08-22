@@ -73,8 +73,8 @@ export default function TemplatesPage() {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Templates</h1>
-        <p className="text-sm text-text-secondary mt-1">
+        <h1 className="text-2xl font-bold text-gray-900">Templates</h1>
+        <p className="text-sm text-gray-500 mt-1">
           Start faster with pre-configured transformation templates.
         </p>
       </div>
@@ -83,14 +83,14 @@ export default function TemplatesPage() {
         {templates.map((template) => (
           <div
             key={template.id}
-            className="glass rounded-2xl p-6 hover:bg-card-hover transition-all group cursor-pointer"
+            className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5 transition-all group cursor-pointer"
           >
             <div className="flex items-start gap-4 mb-4">
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
                 style={{
-                  background: `${template.color}15`,
-                  border: `1px solid ${template.color}25`,
+                  background: `${template.color}10`,
+                  border: `1px solid ${template.color}20`,
                 }}
               >
                 <template.icon
@@ -99,16 +99,16 @@ export default function TemplatesPage() {
                 />
               </div>
               <div className="flex-1">
-                <span className="text-[10px] font-bold text-text-tertiary uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                   {template.category}
                 </span>
-                <h3 className="text-base font-bold text-white mt-0.5">
+                <h3 className="text-base font-bold text-gray-900 mt-0.5">
                   {template.name}
                 </h3>
               </div>
             </div>
 
-            <p className="text-sm text-text-secondary mb-4 leading-relaxed">
+            <p className="text-sm text-gray-500 mb-4 leading-relaxed">
               {template.description}
             </p>
 
@@ -116,7 +116,7 @@ export default function TemplatesPage() {
               {template.outputs.map((fmt) => (
                 <span
                   key={fmt}
-                  className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/[0.05] text-text-secondary"
+                  className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
                 >
                   {fmt}
                 </span>
@@ -125,7 +125,7 @@ export default function TemplatesPage() {
 
             <Link
               href="/app/transform"
-              className="inline-flex items-center gap-2 text-xs font-semibold text-violet-400 hover:text-violet-300 transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
             >
               Use Template
               <ArrowRight className="w-3.5 h-3.5" />

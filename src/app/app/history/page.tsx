@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
   Clock,
   Copy,
   Trash2,
-  ExternalLink,
   Download,
   Wand2,
   Layers,
@@ -84,8 +82,8 @@ export default function HistoryPage() {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">History</h1>
-        <p className="text-sm text-text-secondary mt-1">
+        <h1 className="text-2xl font-bold text-gray-900">History</h1>
+        <p className="text-sm text-gray-500 mt-1">
           Chronological record of all transformations.
         </p>
       </div>
@@ -93,37 +91,37 @@ export default function HistoryPage() {
       <div className="space-y-8">
         {historyData.map((group) => (
           <div key={group.period}>
-            <h2 className="text-xs font-bold text-text-tertiary uppercase tracking-wider mb-3">
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
               {group.period}
             </h2>
             <div className="space-y-2">
               {group.items.map((item) => (
                 <div
                   key={item.id}
-                  className="glass rounded-xl p-4 flex items-center gap-4 hover:bg-card-hover transition-all group"
+                  className="bg-white rounded-xl p-4 flex items-center gap-4 border border-gray-200 hover:border-blue-200 hover:shadow-md hover:shadow-blue-500/5 transition-all group"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center shrink-0">
-                    <item.icon className="w-4 h-4 text-text-tertiary" />
+                  <div className="w-9 h-9 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
+                    <item.icon className="w-4 h-4 text-gray-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-white truncate">
+                    <h3 className="text-sm font-medium text-gray-900 truncate">
                       {item.title}
                     </h3>
-                    <p className="text-[11px] text-text-tertiary mt-0.5">
+                    <p className="text-[11px] text-gray-400 mt-0.5">
                       {item.outputs} outputs · {item.time}
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <button className="px-3 py-1.5 text-[11px] font-medium text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors">
+                    <button className="px-3 py-1.5 text-[11px] font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                       Open
                     </button>
-                    <button className="p-1.5 rounded-lg text-text-tertiary hover:text-white hover:bg-white/[0.06] transition-colors">
+                    <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
                       <Copy className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1.5 rounded-lg text-text-tertiary hover:text-white hover:bg-white/[0.06] transition-colors">
+                    <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
                       <Download className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1.5 rounded-lg text-text-tertiary hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                    <button className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>

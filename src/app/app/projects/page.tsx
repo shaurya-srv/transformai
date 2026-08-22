@@ -6,11 +6,8 @@ import {
   Search,
   FolderOpen,
   Plus,
-  Filter,
-  MoreHorizontal,
-  ExternalLink,
-  Trash2,
   Copy,
+  Trash2,
   Wand2,
 } from "lucide-react";
 
@@ -63,9 +60,9 @@ const mockProjects = [
 ];
 
 const statusColors = {
-  completed: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
-  processing: "bg-amber-500/15 text-amber-400 border-amber-500/20",
-  draft: "bg-slate-500/15 text-slate-400 border-slate-500/20",
+  completed: "bg-emerald-50 text-emerald-600 border-emerald-200",
+  processing: "bg-amber-50 text-amber-600 border-amber-200",
+  draft: "bg-gray-100 text-gray-500 border-gray-200",
 };
 
 export default function ProjectsPage() {
@@ -82,14 +79,14 @@ export default function ProjectsPage() {
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Projects</h1>
-          <p className="text-sm text-text-secondary mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
+          <p className="text-sm text-gray-500 mt-1">
             Manage all your transformation projects.
           </p>
         </div>
         <Link
           href="/app/transform"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-500 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-violet-500/20"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/25"
         >
           <Plus className="w-4 h-4" />
           New Project
@@ -99,13 +96,13 @@ export default function ProjectsPage() {
       {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search projects..."
-            className="w-full pl-10 pr-4 py-2.5 bg-surface border border-white/10 rounded-xl text-sm text-white placeholder:text-text-tertiary focus:outline-none focus:border-violet-500/50 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
           />
         </div>
         <div className="flex gap-2">
@@ -115,8 +112,8 @@ export default function ProjectsPage() {
               onClick={() => setFilter(f)}
               className={`px-3 py-2 rounded-xl text-xs font-medium capitalize transition-all ${
                 filter === f
-                  ? "bg-violet-500/15 text-violet-400 border border-violet-500/20"
-                  : "bg-surface border border-white/5 text-text-tertiary hover:text-text-secondary"
+                  ? "bg-blue-50 text-blue-700 border border-blue-200"
+                  : "bg-white border border-gray-200 text-gray-400 hover:text-gray-600"
               }`}
             >
               {f}
@@ -130,23 +127,23 @@ export default function ProjectsPage() {
         {filtered.map((project) => (
           <div
             key={project.id}
-            className="glass rounded-xl p-5 hover:bg-card-hover transition-all group"
+            className="bg-white rounded-xl p-5 border border-gray-200 hover:border-blue-200 hover:shadow-md hover:shadow-blue-500/5 transition-all group"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-4 flex-1 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
-                  <FolderOpen className="w-5 h-5 text-violet-400" />
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+                  <FolderOpen className="w-5 h-5 text-blue-500" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-white truncate">
+                  <h3 className="text-sm font-bold text-gray-900 truncate">
                     {project.name}
                   </h3>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className="text-[10px] text-text-tertiary">
+                    <span className="text-[10px] text-gray-400">
                       Source: {project.source}
                     </span>
-                    <span className="text-text-tertiary">·</span>
-                    <span className="text-[10px] text-text-tertiary">
+                    <span className="text-gray-300">·</span>
+                    <span className="text-[10px] text-gray-400">
                       {project.created}
                     </span>
                   </div>
@@ -154,7 +151,7 @@ export default function ProjectsPage() {
                     {project.formats.map((fmt) => (
                       <span
                         key={fmt}
-                        className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/[0.05] text-text-secondary"
+                        className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
                       >
                         {fmt}
                       </span>
@@ -172,10 +169,10 @@ export default function ProjectsPage() {
                   {project.status}
                 </span>
                 <div className="flex items-center gap-1">
-                  <button className="p-1.5 rounded-lg text-text-tertiary hover:text-white hover:bg-white/[0.06] transition-colors">
+                  <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
                     <Copy className="w-3.5 h-3.5" />
                   </button>
-                  <button className="p-1.5 rounded-lg text-text-tertiary hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                  <button className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -187,14 +184,14 @@ export default function ProjectsPage() {
 
       {filtered.length === 0 && (
         <div className="text-center py-16">
-          <FolderOpen className="w-12 h-12 text-text-tertiary mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-white mb-2">No projects found</h3>
-          <p className="text-sm text-text-secondary mb-4">
+          <FolderOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-gray-900 mb-2">No projects found</h3>
+          <p className="text-sm text-gray-500 mb-4">
             {search ? "Try a different search term." : "Start your first transformation."}
           </p>
           <Link
             href="/app/transform"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white rounded-xl text-sm font-semibold transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/25"
           >
             <Wand2 className="w-4 h-4" />
             New Transformation

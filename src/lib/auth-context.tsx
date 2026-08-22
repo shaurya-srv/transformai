@@ -8,10 +8,23 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import type { User, AuthState } from "@/lib/types";
 
-interface AuthContextType extends AuthState {
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  organization?: string;
+  avatar?: string;
+  createdAt: string;
+  provider?: "google" | "credentials";
+}
+
+interface AuthContextType {
+  user: User | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogle: () => Promise<{ success: boolean; error?: string }>;
   signup: (data: {
     name: string;
     email: string;
@@ -24,7 +37,7 @@ interface AuthContextType extends AuthState {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const STORAGE_KEY = "transformai_auth";
+const SESSION_KEY = "transformai_session";
 const USERS_KEY = "transformai_users";
 
 function getUsers(): Record<string, { user: User; password: string }> {
@@ -41,7 +54,6 @@ function saveUsers(users: Record<string, { user: User; password: string }>) {
 }
 
 function hashPassword(password: string): string {
-  // Simple hash for demo - NOT production secure
   let hash = 0;
   for (let i = 0; i < password.length; i++) {
     const char = password.charCodeAt(i);
@@ -52,7 +64,11 @@ function hashPassword(password: string): string {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>({
+  const [state, setState] = useState<{
+    user: User | null;
+    isLoading: boolean;
+    isAuthenticated: boolean;
+  }>({
     user: null,
     isLoading: true,
     isAuthenticated: false,
@@ -61,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Restore session on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(SESSION_KEY);
       if (saved) {
         const user = JSON.parse(saved) as User;
         setState({ user, isLoading: false, isAuthenticated: true });
@@ -74,8 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 800));
+    await new Promise((r) => setTimeout(r, 600));
 
     const users = getUsers();
     const record = users[email.toLowerCase()];
@@ -88,8 +103,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { success: false, error: "Incorrect password. Please try again." };
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(record.user));
-    setState({ user: record.user, isLoading: false, isAuthenticated: true });
+    const sessionUser = { ...record.user, provider: "credentials" as const };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
+    setState({ user: sessionUser, isLoading: false, isAuthenticated: true });
+    return { success: true };
+  }, []);
+
+  const loginWithGoogle = useCallback(async () => {
+    // Simulate Google OAuth — creates/uses a Google-authenticated user
+    await new Promise((r) => setTimeout(r, 800));
+
+    const googleUser: User = {
+      id: `ggl_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      email: "user@gmail.com",
+      name: "Google User",
+      createdAt: new Date().toISOString(),
+      provider: "google",
+    };
+
+    localStorage.setItem(SESSION_KEY, JSON.stringify(googleUser));
+    setState({ user: googleUser, isLoading: false, isAuthenticated: true });
     return { success: true };
   }, []);
 
@@ -100,7 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password: string;
       organization?: string;
     }) => {
-      await new Promise((r) => setTimeout(r, 800));
+      await new Promise((r) => setTimeout(r, 600));
 
       const users = getUsers();
       if (users[data.email.toLowerCase()]) {
@@ -121,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
       saveUsers(users);
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      localStorage.setItem(SESSION_KEY, JSON.stringify(user));
       setState({ user, isLoading: false, isAuthenticated: true });
       return { success: true };
     },
@@ -129,12 +162,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const logout = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SESSION_KEY);
     setState({ user: null, isLoading: false, isAuthenticated: false });
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
-    await new Promise((r) => setTimeout(r, 800));
+    await new Promise((r) => setTimeout(r, 600));
     const users = getUsers();
     if (!users[email.toLowerCase()]) {
       return { success: false, error: "No account found with this email address." };
@@ -147,6 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         ...state,
         login,
+        loginWithGoogle,
         signup,
         logout,
         resetPassword,
