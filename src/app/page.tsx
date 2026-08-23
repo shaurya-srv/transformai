@@ -105,6 +105,7 @@ function Navbar() {
 function LaptopMockup() {
   const ref = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const el = ref.current;
@@ -130,7 +131,16 @@ function LaptopMockup() {
       setScrollProgress(progress);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => { observer.disconnect(); window.removeEventListener("scroll", handleScroll); };
+
+    // Mouse parallax for 3D tilt
+    const handleMouse = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      setMousePos({ x, y });
+    };
+    window.addEventListener("mousemove", handleMouse, { passive: true });
+
+    return () => { observer.disconnect(); window.removeEventListener("scroll", handleScroll); window.removeEventListener("mousemove", handleMouse); };
   }, []);
 
   const translateY = 80 - scrollProgress * 80;
@@ -138,52 +148,84 @@ function LaptopMockup() {
   const opacity = 0.3 + scrollProgress * 0.7;
   const glowIntensity = scrollProgress;
 
+  // 3D tilt from mouse + scroll
+  const rotateX = 8 - scrollProgress * 8 + mousePos.y * -3;
+  const rotateY = mousePos.x * 5;
+  const rotateZ = mousePos.x * -1;
+
   return (
-    <div ref={ref} className="relative w-full flex items-center justify-center py-12">
+    <div ref={ref} className="relative w-full flex items-center justify-center py-12" style={{ perspective: "1200px" }}>
       {/* Aurora glow behind device */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full transition-all duration-500"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full transition-all duration-500"
         style={{
-          background: `radial-gradient(ellipse, rgba(139,92,246,${0.2 * glowIntensity}) 0%, rgba(6,182,212,${0.15 * glowIntensity}) 40%, transparent 70%)`,
-          filter: `blur(${60 + glowIntensity * 40}px)`,
+          background: `radial-gradient(ellipse, rgba(139,92,246,${0.25 * glowIntensity}) 0%, rgba(6,182,212,${0.18 * glowIntensity}) 35%, rgba(139,92,246,${0.08 * glowIntensity}) 55%, transparent 75%)`,
+          filter: `blur(${60 + glowIntensity * 50}px)`,
           opacity: glowIntensity,
         }}
       />
 
-      {/* Secondary glow pulse */}
+      {/* Orbiting ring glow */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full animate-glow-pulse"
-        style={{
-          background: `radial-gradient(circle, rgba(139,92,246,${0.15 * glowIntensity}) 0%, transparent 70%)`,
-          filter: "blur(40px)",
-          opacity: glowIntensity * 0.6,
-        }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border border-violet-500/10 animate-spin-slow"
+        style={{ opacity: glowIntensity * 0.4 }}
+      />
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] rounded-full border border-cyan-500/10 animate-spin-slow"
+        style={{ opacity: glowIntensity * 0.3, animationDirection: "reverse", animationDuration: "12s" }}
       />
 
-      {/* Laptop frame */}
+      {/* Floating particles */}
+      {[...Array(6)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: `${3 + i}px`,
+            height: `${3 + i}px`,
+            background: i % 2 === 0 ? "rgba(139,92,246,0.4)" : "rgba(6,182,212,0.4)",
+            left: `${20 + i * 12}%`,
+            top: `${30 + (i % 3) * 15}%`,
+            animation: `float ${3 + i * 0.5}s ease-in-out infinite`,
+            animationDelay: `${i * 0.3}s`,
+            opacity: glowIntensity * 0.6,
+            filter: "blur(1px)",
+          }}
+        />
+      ))}
+
+      {/* Laptop frame with 3D transform */}
       <div
         className="relative z-10 transition-all duration-700 ease-out"
         style={{
-          transform: `translateY(${translateY}px) scale(${scale})`,
+          transform: `translateY(${translateY}px) scale(${scale}) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`,
+          transformStyle: "preserve-3d",
           opacity,
         }}
       >
         {/* Screen bezel */}
-        <div className="relative bg-[#1a1a2e] rounded-t-2xl border border-white/10 border-b-0 overflow-hidden shadow-2xl shadow-black/50" style={{ width: "min(820px, 90vw)", height: "min(500px, 55vw)" }}>
+        <div
+          className="relative bg-[#1a1a2e] rounded-t-2xl border border-white/10 border-b-0 overflow-hidden shadow-2xl shadow-black/50"
+          style={{
+            width: "min(820px, 90vw)",
+            height: "min(500px, 55vw)",
+            boxShadow: `0 25px 80px rgba(139,92,246,${0.15 * glowIntensity}), 0 10px 40px rgba(0,0,0,0.5)`,
+          }}
+        >
           {/* Top bar (notch area) */}
           <div className="flex items-center justify-center h-7 bg-[#12121a] border-b border-white/5">
             <div className="w-20 h-1.5 rounded-full bg-white/10" />
           </div>
 
-          {/* Screen content — TransformAI app UI */}
+          {/* Screen content — Data-rich presentation dashboard */}
           <div className="w-full h-[calc(100%-1.75rem)] bg-[#0a0a0f] p-4 overflow-hidden">
             {/* App top bar */}
             <div className="flex items-center gap-3 mb-3">
               <div className="w-5 h-5 rounded bg-gradient-to-br from-violet-500 to-cyan-500" />
               <span className="text-[10px] font-bold text-white/80">TransformAI</span>
               <div className="flex-1" />
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-white/5" />
+              <div className="flex items-center gap-1.5">
+                <div className="px-2 py-0.5 rounded bg-emerald-500/10 text-[7px] text-emerald-400 border border-emerald-500/20">● Live</div>
                 <div className="w-4 h-4 rounded bg-white/5" />
                 <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
                   <span className="text-[6px] text-white font-bold">U</span>
@@ -193,65 +235,103 @@ function LaptopMockup() {
 
             <div className="flex gap-3">
               {/* Sidebar */}
-              <div className="w-32 shrink-0 space-y-1.5 hidden sm:block">
-                {["Overview", "New Transform", "Projects", "History", "Templates"].map((item, i) => (
-                  <div key={item} className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[9px] ${i === 1 ? "bg-violet-500/10 text-violet-400 border border-violet-500/20" : "text-white/30"}`}>
-                    <div className={`w-3 h-3 rounded ${i === 1 ? "bg-violet-500/30" : "bg-white/10"}`} />
-                    {item}
+              <div className="w-28 shrink-0 space-y-1 hidden sm:block">
+                {[{ n: "Dashboard", a: false }, { n: "Transform", a: true }, { n: "Projects", a: false }, { n: "Analytics", a: false }, { n: "Templates", a: false }, { n: "Settings", a: false }].map((item) => (
+                  <div key={item.n} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[8px] ${item.a ? "bg-violet-500/10 text-violet-400 border border-violet-500/20" : "text-white/25 hover:text-white/40"}`}>
+                    <div className={`w-2.5 h-2.5 rounded-sm ${item.a ? "bg-violet-500/30" : "bg-white/8"}`} />
+                    {item.n}
                   </div>
                 ))}
               </div>
 
-              {/* Main content */}
-              <div className="flex-1 space-y-3">
+              {/* Main content — presentation view */}
+              <div className="flex-1 space-y-2.5">
+                {/* Title bar */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-[11px] font-bold text-white/90">CVE-2024-38816 — Security Advisory</div>
+                    <div className="text-[7px] text-white/30">Generated 2 min ago · 7 deliverables · 96% accuracy</div>
+                  </div>
+                  <div className="flex gap-1">
+                    <div className="px-1.5 py-0.5 rounded bg-white/5 text-[6px] text-white/30">Export</div>
+                    <div className="px-1.5 py-0.5 rounded bg-violet-500/10 text-[6px] text-violet-400">Share</div>
+                  </div>
+                </div>
+
                 {/* Stats row */}
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-5 gap-1.5">
                   {[
-                    { label: "Outputs", value: "24", color: "violet" },
-                    { label: "Sources", value: "8", color: "cyan" },
-                    { label: "Accuracy", value: "96%", color: "emerald" },
-                    { label: "Time Saved", value: "14h", color: "amber" },
-                  ].map((stat) => (
-                    <div key={stat.label} className="bg-white/[0.03] border border-white/5 rounded-lg p-2">
-                      <div className="text-[7px] text-white/30 uppercase">{stat.label}</div>
-                      <div className={`text-sm font-bold text-${stat.color}-400`}>{stat.value}</div>
+                    { l: "Outputs", v: "7", c: "#8b5cf6" },
+                    { l: "Sources", v: "1", c: "#06b6d4" },
+                    { l: "Accuracy", v: "96%", c: "#10b981" },
+                    { l: "Consistency", v: "94%", c: "#10b981" },
+                    { l: "Time Saved", v: "4.2h", c: "#f59e0b" },
+                  ].map((s) => (
+                    <div key={s.l} className="bg-white/[0.03] border border-white/5 rounded-lg p-1.5 text-center">
+                      <div className="text-[6px] text-white/25 uppercase tracking-wider">{s.l}</div>
+                      <div className="text-[11px] font-bold" style={{ color: s.c }}>{s.v}</div>
                     </div>
                   ))}
                 </div>
 
-                {/* Source input area */}
-                <div className="bg-white/[0.03] border border-white/5 rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="px-2 py-0.5 rounded bg-violet-500/10 text-[7px] text-violet-400 border border-violet-500/20">Text</div>
-                    <div className="px-2 py-0.5 rounded bg-white/5 text-[7px] text-white/30">URL</div>
-                    <div className="px-2 py-0.5 rounded bg-white/5 text-[7px] text-white/30">Upload</div>
-                  </div>
-                  <div className="bg-white/[0.02] border border-white/5 rounded-md p-2 h-16">
-                    <div className="text-[8px] text-white/20 leading-relaxed">
-                      CRITICAL SECURITY ADVISORY — Active exploitation detected in VPN infrastructure. CVE-2024-38816, CVSS 9.8...
+                {/* Two-column layout: Chart + Output list */}
+                <div className="flex gap-2.5">
+                  {/* Left: Mini chart */}
+                  <div className="flex-1 bg-white/[0.03] border border-white/5 rounded-lg p-2.5">
+                    <div className="text-[7px] text-white/30 uppercase mb-2">Transformation Pipeline</div>
+                    {/* Bar chart */}
+                    <div className="flex items-end gap-1 h-16">
+                      {[65, 82, 45, 90, 72, 88, 95].map((h, i) => (
+                        <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+                          <div
+                            className="w-full rounded-t-sm"
+                            style={{
+                              height: `${h}%`,
+                              background: `linear-gradient(to top, rgba(139,92,246,${0.3 + i * 0.08}), rgba(6,182,212,${0.2 + i * 0.05}))`,
+                            }}
+                          />
+                          <div className="text-[5px] text-white/20">{["Lin", "X", "Adv", "Vid", "Pre", "Inf", "Exe"][i]}</div>
+                        </div>
+                      ))}
                     </div>
+                  </div>
+
+                  {/* Right: Output list */}
+                  <div className="w-[45%] space-y-1.5">
+                    {[
+                      { icon: "📱", name: "LinkedIn Post", words: "284", status: "done" },
+                      { icon: "🐦", name: "X/Twitter Thread", words: "180", status: "done" },
+                      { icon: "📋", name: "Security Advisory", words: "1,240", status: "done" },
+                      { icon: "🎬", name: "Video Script", words: "890", status: "done" },
+                      { icon: "📊", name: "Presentation (6 slides)", words: "1,100", status: "done" },
+                      { icon: "🖼️", name: "Infographic Spec", words: "320", status: "done" },
+                      { icon: "📄", name: "Executive Summary", words: "560", status: "done" },
+                    ].map((o) => (
+                      <div key={o.name} className="flex items-center gap-2 bg-white/[0.02] border border-white/5 rounded-lg px-2 py-1.5">
+                        <span className="text-[9px]">{o.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[7px] font-medium text-white/50 truncate">{o.name}</div>
+                        </div>
+                        <div className="text-[6px] text-white/20">{o.words}w</div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Output cards */}
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { icon: "📱", name: "LinkedIn Post", status: "Ready", color: "emerald" },
-                    { icon: "🎬", name: "Video Package", status: "Ready", color: "emerald" },
-                    { icon: "📋", name: "Advisory", status: "Ready", color: "emerald" },
-                    { icon: "📊", name: "Presentation", status: "Ready", color: "emerald" },
-                  ].map((output) => (
-                    <div key={output.name} className="flex items-center gap-2 bg-white/[0.03] border border-white/5 rounded-lg p-2">
-                      <span className="text-[10px]">{output.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[8px] font-medium text-white/60 truncate">{output.name}</div>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-1 h-1 rounded-full bg-emerald-400" />
-                        <span className="text-[7px] text-emerald-400">{output.status}</span>
-                      </div>
-                    </div>
-                  ))}
+                {/* Bottom: Consistency score bar */}
+                <div className="flex items-center gap-3 bg-white/[0.02] border border-white/5 rounded-lg px-3 py-1.5">
+                  <div className="text-[7px] text-white/30">Consistency</div>
+                  <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full" style={{ width: "94%" }} />
+                  </div>
+                  <div className="text-[7px] font-bold text-emerald-400">94%</div>
+                  <div className="text-[6px] text-white/20">|</div>
+                  <div className="text-[7px] text-white/30">Source Grounding</div>
+                  <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-cyan-500 to-violet-500 rounded-full" style={{ width: "96%" }} />
+                  </div>
+                  <div className="text-[7px] font-bold text-emerald-400">96%</div>
                 </div>
               </div>
             </div>
@@ -259,7 +339,7 @@ function LaptopMockup() {
         </div>
 
         {/* Laptop base */}
-        <div className="relative">
+        <div className="relative" style={{ transform: "translateZ(-1px)" }}>
           <div className="bg-[#1a1a2e] h-3 rounded-b-xl border border-white/10 border-t-0" style={{ width: "calc(min(820px, 90vw) + 20px)", marginLeft: "-10px" }} />
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-1 rounded-full bg-white/10" />
         </div>
