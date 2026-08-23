@@ -21,6 +21,8 @@ import {
   Clock,
   Users,
   TrendingUp,
+  X,
+  ExternalLink,
 } from "lucide-react";
 
 // ── Floating Nav ─────────────────────────────────────────────────────────
@@ -31,6 +33,10 @@ function Navbar() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <nav
@@ -51,14 +57,29 @@ function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          {["Platform", "Workflow", "Capabilities", "Templates"].map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
-            >
-              {item}
-            </a>
+          {[
+            { label: "Platform", id: "platform" },
+            { label: "Workflow", id: "how-it-works" },
+            { label: "Capabilities", id: "platform" },
+            { label: "Templates", id: null, href: "/app/templates" },
+          ].map((item) => (
+            item.href ? (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <button
+                key={item.label}
+                onClick={() => item.id && scrollTo(item.id)}
+                className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+              >
+                {item.label}
+              </button>
+            )
           ))}
         </div>
 
@@ -153,8 +174,9 @@ function HeroVisualization() {
                 />
               </svg>
 
-              <div
-                className="w-[72px] h-[48px] rounded-xl flex items-center justify-center gap-1.5 backdrop-blur-sm transition-all hover:scale-110 cursor-default shadow-sm"
+              <Link
+                href="/signup"
+                className="w-[72px] h-[48px] rounded-xl flex items-center justify-center gap-1.5 backdrop-blur-sm transition-all hover:scale-110 cursor-pointer shadow-sm"
                 style={{
                   background: `${output.color}10`,
                   border: `1px solid ${output.color}25`,
@@ -172,7 +194,7 @@ function HeroVisualization() {
                 >
                   {output.label}
                 </span>
-              </div>
+              </Link>
             </div>
           );
         })}
@@ -272,12 +294,12 @@ export default function LandingPage() {
                   Start Transforming
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                <a
-                  href="#how-it-works"
+                <button
+                  onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300 rounded-xl text-sm font-semibold transition-all"
                 >
                   See How It Works
-                </a>
+                </button>
               </div>
 
               {/* Floating metric */}
@@ -602,8 +624,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ FOOTER ══════════════════════════════════════════════════════ */}
-      <footer className="py-8 px-6 border-t border-gray-200 bg-gray-50">
+      {/* ═══ FOOTER ══════════════════════════════════════════════════════ */}          <footer className="py-8 px-6 border-t border-gray-200 bg-gray-50">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
@@ -615,13 +636,18 @@ export default function LandingPage() {
             One Source. Infinite Communication.
           </p>
           <div className="flex gap-6">
-            {["Platform", "Templates", "API"].map((link) => (
-              <span
-                key={link}
-                className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer transition-colors"
+            {[
+              { label: "Platform", href: "#platform" },
+              { label: "Templates", href: "/app/templates" },
+              { label: "API", href: "#" },
+            ].map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
               >
-                {link}
-              </span>
+                {link.label}
+              </Link>
             ))}
           </div>
         </div>

@@ -141,9 +141,51 @@ function Sidebar({
 
 function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
   const { user, logout } = useAuth();
-  const [showDropdown, setShowDropdown] = useState(false);
+  const router = useRouter();
+  const [showProfile, setShowProfile] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Keyboard shortcut: Cmd/Ctrl+K opens search
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setShowSearch(true);
+      }
+      if (e.key === "Escape") {
+        setShowSearch(false);
+        setShowHelp(false);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  const notifications = [
+    { id: 1, text: "Transformation completed: Cybersecurity Advisory", time: "2m ago", unread: true },
+    { id: 2, text: "New template available: Incident Report", time: "1h ago", unread: true },
+    { id: 3, text: "LinkedIn post export ready for download", time: "3h ago", unread: false },
+    { id: 4, text: "System maintenance scheduled for Sunday", time: "1d ago", unread: false },
+  ];
+
+  const searchSuggestions = [
+    { label: "New Transformation", action: () => { router.push("/app/transform"); setShowSearch(false); } },
+    { label: "View Projects", action: () => { router.push("/app/projects"); setShowSearch(false); } },
+    { label: "Browse Templates", action: () => { router.push("/app/templates"); setShowSearch(false); } },
+    { label: "Transformation History", action: () => { router.push("/app/history"); setShowSearch(false); } },
+    { label: "Saved Outputs", action: () => { router.push("/app/saved"); setShowSearch(false); } },
+    { label: "Settings", action: () => { router.push("/app/settings"); setShowSearch(false); } },
+  ];
+
+  const filteredSuggestions = searchQuery
+    ? searchSuggestions.filter(s => s.label.toLowerCase().includes(searchQuery.toLowerCase()))
+    : searchSuggestions;
 
   return (
+    <>
     <header className="fixed top-0 left-0 lg:left-[260px] right-0 h-14 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-30 flex items-center px-4 gap-3">
       {/* Mobile menu toggle */}
       <button
@@ -155,7 +197,10 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
 
       {/* Search */}
       <div className="flex-1 max-w-md">
-        <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-all w-full max-w-xs">
+        <button
+          onClick={() => setShowSearch(true)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-all w-full max-w-xs"
+        >
           <Search className="w-3.5 h-3.5" />
           <span>Search...</span>
           <kbd className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 font-mono">
@@ -166,20 +211,79 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
 
       <div className="flex items-center gap-2">
         {/* Notifications */}
-        <button className="relative p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors">
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-blue-500" />
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => { setShowNotifications(!showNotifications); setShowProfile(false); }}
+            className="relative p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <Bell className="w-4 h-4" />
+            {notifications.some(n => n.unread) && (
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-blue-500" />
+            )}
+          </button>
+          {showNotifications && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
+              <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-50 animate-fade-in">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                  <span className="text-sm font-semibold text-gray-900">Notifications</span>
+                  <span className="text-xs text-blue-600 cursor-pointer hover:text-blue-700">Mark all read</span>
+                </div>
+                <div className="max-h-72 overflow-y-auto">
+                  {notifications.map(n => (
+                    <div key={n.id} className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors ${n.unread ? "bg-blue-50/50" : ""}`}>
+                      <p className="text-sm text-gray-900 leading-snug">{n.text}</p>
+                      <p className="text-[11px] text-gray-400 mt-1">{n.time}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="px-4 py-2 border-t border-gray-100 text-center">
+                  <button className="text-xs text-blue-600 hover:text-blue-700 font-medium">View all notifications</button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
 
         {/* Help */}
-        <button className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-          ?
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => { setShowHelp(!showHelp); setShowProfile(false); }}
+            className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"
+          >
+            ?
+          </button>
+          {showHelp && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setShowHelp(false)} />
+              <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-xl z-50 p-5 animate-fade-in">
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">Help & Resources</h3>
+                <div className="space-y-2">
+                  <button onClick={() => { router.push("/app/transform"); setShowHelp(false); }} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                    🚀 Quick Start Guide
+                  </button>
+                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                    📖 Documentation
+                  </button>
+                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                    💬 Contact Support
+                  </button>
+                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                    ⌨️ Keyboard Shortcuts
+                  </button>
+                </div>
+                <div className="mt-4 pt-3 border-t border-gray-100">
+                  <p className="text-[11px] text-gray-400">TransformAI v1.0 — Smart India Hackathon 2026</p>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
 
         {/* User dropdown */}
         <div className="relative">
           <button
-            onClick={() => setShowDropdown(!showDropdown)}
+            onClick={() => { setShowProfile(!showProfile); setShowNotifications(false); setShowHelp(false); }}
             className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
@@ -190,47 +294,40 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
             <ChevronDown className="w-3 h-3 text-gray-400" />
           </button>
 
-          {showDropdown && (
+          {showProfile && (
             <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setShowDropdown(false)}
-              />
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50 animate-fade-in">
-                <div className="px-3 py-2 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {user?.name}
-                  </p>
-                  <p className="text-[10px] text-gray-400 truncate">
-                    {user?.email}
-                  </p>
+              <div className="fixed inset-0 z-40" onClick={() => setShowProfile(false)} />
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50 animate-fade-in">
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
+                  <p className="text-[11px] text-gray-400 truncate">{user?.email}</p>
+                  {user?.organization && <p className="text-[11px] text-gray-400 truncate mt-0.5">{user.organization}</p>}
                 </div>
-                <Link
-                  href="/app/settings"
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-                  onClick={() => setShowDropdown(false)}
-                >
-                  <User className="w-3.5 h-3.5" />
-                  Profile
-                </Link>
-                <Link
-                  href="/app/settings"
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-                  onClick={() => setShowDropdown(false)}
-                >
-                  <Settings className="w-3.5 h-3.5" />
-                  Settings
-                </Link>
-                <div className="border-t border-gray-100 mt-1 pt-1">
-                  <button
-                    onClick={() => {
-                      logout();
-                      setShowDropdown(false);
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full"
+                <div className="py-1">
+                  <Link
+                    href="/app/settings"
+                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                    onClick={() => setShowProfile(false)}
                   >
-                    <LogOut className="w-3.5 h-3.5" />
-                    Logout
+                    <User className="w-4 h-4" />
+                    Profile
+                  </Link>
+                  <Link
+                    href="/app/settings"
+                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                    onClick={() => setShowProfile(false)}
+                  >
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </Link>
+                </div>
+                <div className="border-t border-gray-100 py-1">
+                  <button
+                    onClick={() => { logout(); setShowProfile(false); }}
+                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
                   </button>
                 </div>
               </div>
@@ -239,6 +336,44 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
         </div>
       </div>
     </header>
+
+    {/* Search Modal */}
+    {showSearch && (
+      <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowSearch(false)} />
+        <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-200 z-10 animate-fade-in">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+            <Search className="w-5 h-5 text-gray-400" />
+            <input
+              autoFocus
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search projects, templates, pages..."
+              className="flex-1 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
+            />
+            <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 font-mono">ESC</kbd>
+          </div>
+          <div className="max-h-64 overflow-y-auto p-2">
+            {filteredSuggestions.length > 0 ? (
+              filteredSuggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={s.action}
+                  className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition-colors flex items-center gap-2"
+                >
+                  <Search className="w-3.5 h-3.5 text-gray-400" />
+                  {s.label}
+                </button>
+              ))
+            ) : (
+              <p className="text-sm text-gray-400 text-center py-6">No results found</p>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
 
