@@ -28,6 +28,7 @@ import { GlitchText } from "@/components/GlitchText";
 import { TypewriterText } from "@/components/TypewriterText";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { HeroEffects } from "@/components/HeroEffects";
+import { TrustedBy, BeforeAfter, LiveMetrics, Testimonials, WorkflowPipeline } from "@/components/ProfessionalSections";
 
 // ── Floating Nav ─────────────────────────────────────────────────────────
 function Navbar() {
@@ -748,6 +749,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+n      {/* ═══ TRUSTED BY ═══════════════════════════════════════════════ */}
+      <TrustedBy />
       {/* ═══ SHOWCASE SLIDESHOW ════════════════════════════════════════ */}
       <ScrollReveal direction="up" delay={100}>
         <ShowcaseSlideshow />
@@ -830,6 +833,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+n      {/* ═══ BEFORE / AFTER ═══════════════════════════════════════════ */}
+      <BeforeAfter />
       {/* ═══ HOW IT WORKS ═══════════════════════════════════════════════ */}
       <section id="how-it-works" className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
@@ -915,6 +920,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+n      {/* ═══ WORKFLOW PIPELINE ════════════════════════════════════════ */}
+      <WorkflowPipeline />
       {/* ═══ CAPABILITIES ═══════════════════════════════════════════════ */}
       <section id="platform" className="py-24 px-6 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-950/10 to-transparent pointer-events-none" />
@@ -959,6 +966,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+n      {/* ═══ LIVE METRICS ═════════════════════════════════════════════ */}
+      <LiveMetrics />
       {/* ═══ STATS ═══════════════════════════════════════════════════════ */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
@@ -985,6 +994,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+n      {/* ═══ TESTIMONIALS ═════════════════════════════════════════════ */}
+      <Testimonials />
       {/* ═══ FINAL CTA ══════════════════════════════════════════════════ */}
       <section className="py-24 px-6 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-violet-950/20 to-transparent pointer-events-none" />
