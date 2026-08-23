@@ -65,7 +65,7 @@ export default function SettingsPage() {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-5xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <h1 className="text-2xl font-bold text-white">Settings</h1>
         <p className="text-sm text-gray-500 mt-1">
           Manage your account, preferences, and integrations.
         </p>
@@ -81,8 +81,8 @@ export default function SettingsPage() {
                 onClick={() => setActiveSection(s.id)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
                   activeSection === s.id
-                    ? "bg-blue-50 text-blue-700 border border-blue-100"
-                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                    ? "bg-violet-500/10 text-violet-400 border border-violet-500/15"
+                    : "text-gray-400 hover:text-gray-400 hover:bg-white/[0.03]"
                 }`}
               >
                 <s.icon className="w-4 h-4" />
@@ -97,8 +97,8 @@ export default function SettingsPage() {
           {/* Profile */}
           {activeSection === "profile" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-white rounded-2xl p-6 border border-gray-200">
-                <h2 className="text-base font-bold text-gray-900 mb-6">Profile</h2>
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+                <h2 className="text-base font-bold text-white mb-6">Profile</h2>
 
                 {/* Avatar */}
                 <div className="flex items-center gap-4 mb-6">
@@ -108,7 +108,7 @@ export default function SettingsPage() {
                     </span>
                   </div>
                   <div>
-                    <button className="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
+                    <button className="px-3 py-1.5 text-xs font-medium text-violet-400 bg-violet-500/10 border border-violet-500/20 rounded-lg hover:bg-violet-500/10 transition-colors">
                       Change Photo
                     </button>
                     <p className="text-[10px] text-gray-400 mt-1">
@@ -119,36 +119,36 @@ export default function SettingsPage() {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       Full Name
                     </label>
                     <input
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       Email
                     </label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       Organization
                     </label>
                     <input
                       type="text"
                       value={organization}
                       onChange={(e) => setOrganization(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     />
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/25 disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/25 disabled:opacity-50"
               >
                 {isSaving ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -172,11 +172,11 @@ export default function SettingsPage() {
           {/* Security */}
           {activeSection === "security" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-white rounded-2xl p-6 border border-gray-200">
-                <h2 className="text-base font-bold text-gray-900 mb-6">Change Password</h2>
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+                <h2 className="text-base font-bold text-white mb-6">Change Password</h2>
                 <div className="space-y-4 max-w-md">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       Current Password
                     </label>
                     <div className="relative">
@@ -184,19 +184,19 @@ export default function SettingsPage() {
                         type={showCurrentPw ? "text" : "password"}
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all pr-10"
+                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowCurrentPw(!showCurrentPw)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-400"
                       >
                         {showCurrentPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       New Password
                     </label>
                     <div className="relative">
@@ -204,12 +204,12 @@ export default function SettingsPage() {
                         type={showNewPw ? "text" : "password"}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all pr-10"
+                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowNewPw(!showNewPw)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-400"
                       >
                         {showNewPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -217,19 +217,19 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={handleSave}
-                    className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/25"
+                    className="px-5 py-2.5 bg-violet-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/25"
                   >
                     Update Password
                   </button>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 border border-gray-200">
-                <h2 className="text-base font-bold text-gray-900 mb-4">Active Sessions</h2>
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+                <h2 className="text-base font-bold text-white mb-4">Active Sessions</h2>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5">
                     <div>
-                      <p className="text-sm text-gray-900 font-medium">Current Session</p>
+                      <p className="text-sm text-white font-medium">Current Session</p>
                       <p className="text-[10px] text-gray-400">Chrome · Just now</p>
                     </div>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
@@ -247,18 +247,18 @@ export default function SettingsPage() {
           {/* AI Preferences */}
           {activeSection === "ai" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-white rounded-2xl p-6 border border-gray-200">
-                <h2 className="text-base font-bold text-gray-900 mb-6">AI Preferences</h2>
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+                <h2 className="text-base font-bold text-white mb-6">AI Preferences</h2>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       <Globe className="w-3.5 h-3.5 inline mr-1" />
                       Default Language
                     </label>
                     <select
                       value={defaultLanguage}
                       onChange={(e) => setDefaultLanguage(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     >
                       {["English", "Hindi", "Spanish", "French", "German"].map((l) => (
                         <option key={l} value={l}>{l}</option>
@@ -266,14 +266,14 @@ export default function SettingsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       <Palette className="w-3.5 h-3.5 inline mr-1" />
                       Default Tone
                     </label>
                     <select
                       value={defaultTone}
                       onChange={(e) => setDefaultTone(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     >
                       {["Professional", "Urgent", "Authoritative", "Conversational", "Formal"].map(
                         (t) => (
@@ -283,13 +283,13 @@ export default function SettingsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       Default Audience
                     </label>
                     <select
                       value={defaultAudience}
                       onChange={(e) => setDefaultAudience(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     >
                       {["General", "Executive", "Technical", "Public", "Media"].map((a) => (
                         <option key={a} value={a}>{a}</option>
@@ -297,13 +297,13 @@ export default function SettingsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       Default Detail Level
                     </label>
                     <select
                       value={defaultDetail}
                       onChange={(e) => setDefaultDetail(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     >
                       {["Brief", "Standard", "Detailed"].map((d) => (
                         <option key={d} value={d}>{d}</option>
@@ -316,7 +316,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/25 disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/25 disabled:opacity-50"
               >
                 {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Save Preferences
@@ -327,8 +327,8 @@ export default function SettingsPage() {
           {/* Notifications */}
           {activeSection === "notifications" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-white rounded-2xl p-6 border border-gray-200">
-                <h2 className="text-base font-bold text-gray-900 mb-6">Notifications</h2>
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+                <h2 className="text-base font-bold text-white mb-6">Notifications</h2>
                 <div className="space-y-4">
                   {[
                     {
@@ -352,16 +352,16 @@ export default function SettingsPage() {
                   ].map((item) => (
                     <div
                       key={item.label}
-                      className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100"
+                      className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5"
                     >
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{item.label}</p>
+                        <p className="text-sm font-medium text-white">{item.label}</p>
                         <p className="text-[11px] text-gray-400 mt-0.5">{item.desc}</p>
                       </div>
                       <button
                         onClick={() => item.onChange(!item.checked)}
                         className={`relative w-10 h-6 rounded-full transition-colors ${
-                          item.checked ? "bg-blue-600" : "bg-gray-200"
+                          item.checked ? "bg-violet-600" : "bg-gray-200"
                         }`}
                       >
                         <div
@@ -380,21 +380,21 @@ export default function SettingsPage() {
           {/* Organization */}
           {activeSection === "organization" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-white rounded-2xl p-6 border border-gray-200">
-                <h2 className="text-base font-bold text-gray-900 mb-6">Organization</h2>
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+                <h2 className="text-base font-bold text-white mb-6">Organization</h2>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       Organization Name
                     </label>
                     <input
                       type="text"
                       defaultValue={user?.organization || ""}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       Team Members
                     </label>
                     <p className="text-xs text-gray-400">
@@ -409,18 +409,18 @@ export default function SettingsPage() {
           {/* API */}
           {activeSection === "api" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-white rounded-2xl p-6 border border-gray-200">
-                <h2 className="text-base font-bold text-gray-900 mb-6">API / Integrations</h2>
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+                <h2 className="text-base font-bold text-white mb-6">API / Integrations</h2>
                 <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-                    <p className="text-sm font-medium text-gray-900 mb-1">API Access</p>
+                  <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                    <p className="text-sm font-medium text-white mb-1">API Access</p>
                     <p className="text-[11px] text-gray-400">
                       Programmatic access to TransformAI is coming soon. You&apos;ll be able to
                       integrate transformations into your workflows via REST API.
                     </p>
                   </div>
-                  <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-                    <p className="text-sm font-medium text-gray-900 mb-1">Webhooks</p>
+                  <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                    <p className="text-sm font-medium text-white mb-1">Webhooks</p>
                     <p className="text-[11px] text-gray-400">
                       Receive real-time notifications when transformations complete. Coming in
                       the next release.

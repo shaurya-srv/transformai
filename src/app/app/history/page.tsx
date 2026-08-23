@@ -125,13 +125,13 @@ export default function HistoryPage() {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">History</h1>
+          <h1 className="text-2xl font-bold text-white">History</h1>
           <p className="text-sm text-gray-500 mt-1">
             Chronological record of all transformations.
           </p>
         </div>
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+          <Loader2 className="w-6 h-6 text-violet-400 animate-spin" />
         </div>
       </div>
     );
@@ -140,7 +140,7 @@ export default function HistoryPage() {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">History</h1>
+        <h1 className="text-2xl font-bold text-white">History</h1>
         <p className="text-sm text-gray-500 mt-1">
           Chronological record of all transformations.
         </p>
@@ -149,7 +149,7 @@ export default function HistoryPage() {
       {historyData.length === 0 ? (
         <div className="text-center py-16">
           <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-gray-900 mb-2">
+          <h3 className="text-lg font-bold text-white mb-2">
             No history yet
           </h3>
           <p className="text-sm text-gray-500 mb-4">
@@ -157,7 +157,7 @@ export default function HistoryPage() {
           </p>
           <Link
             href="/app/transform"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/25"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/25"
           >
             <Wand2 className="w-4 h-4" /> Start Transformation
           </Link>
@@ -173,13 +173,13 @@ export default function HistoryPage() {
                 {group.items.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white rounded-xl p-4 flex items-center gap-4 border border-gray-200 hover:border-blue-200 hover:shadow-md hover:shadow-blue-500/5 transition-all group"
+                    className="bg-[#12121a] rounded-xl p-4 flex items-center gap-4 border border-white/10 hover:border-violet-500/20 hover:shadow-md hover:shadow-blue-500/5 transition-all group"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center shrink-0">
                       <item.icon className="w-4 h-4 text-gray-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-gray-900 truncate">
+                      <h3 className="text-sm font-medium text-white truncate">
                         {item.name}
                       </h3>
                       <p className="text-[11px] text-gray-400 mt-0.5">
@@ -187,13 +187,13 @@ export default function HistoryPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <button className="px-3 py-1.5 text-[11px] font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                      <button className="px-3 py-1.5 text-[11px] font-medium text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors">
                         Open
                       </button>
-                      <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+                      <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-300 hover:bg-white/5 transition-colors">
                         <Copy className="w-3.5 h-3.5" />
                       </button>
-                      <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+                      <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-300 hover:bg-white/5 transition-colors">
                         <Download className="w-3.5 h-3.5" />
                       </button>
                       <button className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">

@@ -130,9 +130,9 @@ export default function AppDashboard() {
       value: stats.transformations || 0,
       suffix: "",
       icon: Layers,
-      color: "text-blue-500",
-      bg: "bg-blue-50",
-      border: "border-blue-100",
+      color: "text-violet-400",
+      bg: "bg-violet-500/10",
+      border: "border-violet-500/15",
       change: stats.transformations > 0 ? "Total projects" : "Start your first",
     },
     {
@@ -172,7 +172,7 @@ export default function AppDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-white">
             {getGreeting()}, {user?.name?.split(" ")[0] || "there"}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
@@ -204,7 +204,7 @@ export default function AppDashboard() {
           </div>
           <Link
             href="/app/transform"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-700 rounded-xl text-sm font-bold hover:bg-blue-50 transition-colors shadow-lg shadow-blue-900/20 shrink-0"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-violet-400 rounded-xl text-sm font-bold hover:bg-violet-500/10 transition-colors shadow-lg shadow-blue-900/20 shrink-0"
           >
             <Wand2 className="w-4 h-4" />
             Start New Transformation
@@ -218,7 +218,7 @@ export default function AppDashboard() {
         {statCards.map((stat) => (
           <div
             key={stat.label}
-            className="bg-white rounded-xl p-5 border border-gray-200 hover:border-blue-200 hover:shadow-md hover:shadow-blue-500/5 transition-all"
+            className="bg-[#12121a] rounded-xl p-5 border border-white/10 hover:border-violet-500/20 hover:shadow-md hover:shadow-blue-500/5 transition-all"
           >
             <div className="flex items-center gap-3 mb-3">
               <div
@@ -230,7 +230,7 @@ export default function AppDashboard() {
                 {stat.label}
               </span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold text-white">
               <AnimatedValue end={stat.value} suffix={stat.suffix} />
             </div>
             <div className="text-[10px] text-gray-400 mt-1">{stat.change}</div>
@@ -239,14 +239,14 @@ export default function AppDashboard() {
       </div>
 
       {/* Recent Transformations */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-gray-900">
+      <div className="bg-[#12121a] rounded-xl border border-white/10 overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+          <h3 className="text-sm font-bold text-white">
             Recent Transformations
           </h3>
           <Link
             href="/app/history"
-            className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            className="text-xs text-violet-400 hover:text-violet-400 font-medium transition-colors"
           >
             View all →
           </Link>
@@ -280,13 +280,13 @@ export default function AppDashboard() {
               return (
                 <div
                   key={project.id}
-                  className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-4 px-6 py-4 hover:bg-white/[0.03] transition-colors"
                 >
-                  <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-50 border border-gray-100 shrink-0">
+                  <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.03] border border-white/5 shrink-0">
                     <Icon className="w-4 h-4 text-gray-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 truncate">
+                    <div className="text-sm font-medium text-white truncate">
                       {project.name}
                     </div>
                     <div className="text-xs text-gray-400 mt-0.5">
@@ -311,20 +311,20 @@ export default function AppDashboard() {
                     {formats.slice(0, 3).map((type) => (
                       <span
                         key={type}
-                        className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
+                        className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 text-gray-400"
                       >
                         {type}
                       </span>
                     ))}
                     {formats.length > 3 && (
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 text-gray-400">
                         +{formats.length - 3}
                       </span>
                     )}
                   </div>
                   <Link
                     href="/app/transform"
-                    className="text-xs font-medium text-blue-600 hover:text-blue-700 shrink-0"
+                    className="text-xs font-medium text-violet-400 hover:text-violet-400 shrink-0"
                   >
                     View →
                   </Link>
@@ -337,7 +337,7 @@ export default function AppDashboard() {
                 No transformations yet.{" "}
                 <Link
                   href="/app/transform"
-                  className="text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-violet-400 hover:text-violet-400 font-medium"
                 >
                   Start your first one →
                 </Link>

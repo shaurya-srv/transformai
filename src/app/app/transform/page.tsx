@@ -66,10 +66,10 @@ function StepIndicator({ current }: { current: number }) {
               <div
                 className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300",
-                  done && "bg-emerald-500 border-emerald-500 text-white",
+                  done && "bg-emerald-500/100 border-emerald-500 text-white",
                   active &&
-                    "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/30",
-                  !done && !active && "bg-white border-gray-200 text-gray-400"
+                    "bg-violet-600 border-blue-600 text-white shadow-lg shadow-violet-500/30",
+                  !done && !active && "bg-white/5 border-white/10 text-gray-400"
                 )}
               >
                 {done ? <Check className="w-4 h-4" /> : s.num}
@@ -78,7 +78,7 @@ function StepIndicator({ current }: { current: number }) {
                 className={cn(
                   "text-[10px] font-bold mt-1.5 uppercase tracking-wider",
                   done && "text-emerald-500",
-                  active && "text-blue-600",
+                  active && "text-violet-400",
                   !done && !active && "text-gray-400"
                 )}
               >
@@ -89,7 +89,7 @@ function StepIndicator({ current }: { current: number }) {
               <div
                 className={cn(
                   "flex-1 h-0.5 mx-2 mt-[-14px] rounded-full transition-colors",
-                  done ? "bg-emerald-500" : "bg-gray-200"
+                  done ? "bg-emerald-500/100" : "bg-gray-200"
                 )}
               />
             )}
@@ -135,14 +135,14 @@ function AiProcessingScreen({
     <div className="max-w-3xl mx-auto text-center py-12 relative z-10">
       {/* Ambient glow */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[150px]" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-violet-500/100/5 rounded-full blur-[150px]" />
       </div>
 
       <div className="mb-8">
-        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-500/25">
+        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-violet-500/25">
           <Sparkles className="w-10 h-10 text-white" />
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+        <h2 className="text-3xl font-bold text-white mb-3">
           {complete ? "Transformation Complete" : "TransformAI is working"}
         </h2>
         <p className="text-base text-gray-500 max-w-md mx-auto">
@@ -153,7 +153,7 @@ function AiProcessingScreen({
       </div>
 
       {/* Pipeline */}
-      <div className="bg-white rounded-2xl p-6 mb-8 text-left border border-gray-200 shadow-sm">
+      <div className="bg-[#12121a] rounded-2xl p-6 mb-8 text-left border border-white/10 ">
         <div className="space-y-3">
           {pipelineSteps.map((ps, i) => {
             const stepNum = i + 1;
@@ -170,15 +170,15 @@ function AiProcessingScreen({
                 {isDone ? (
                   <Check className="w-4 h-4 text-emerald-500 shrink-0" />
                 ) : isCurrent ? (
-                  <Loader2 className="w-4 h-4 text-blue-500 shrink-0 animate-spin" />
+                  <Loader2 className="w-4 h-4 text-violet-400 shrink-0 animate-spin" />
                 ) : (
                   <Circle className="w-4 h-4 text-gray-200 shrink-0" />
                 )}
                 <span
                   className={cn(
                     "text-sm",
-                    isDone && "text-emerald-600 font-medium",
-                    isCurrent && "text-blue-600 font-semibold",
+                    isDone && "text-emerald-400 font-medium",
+                    isCurrent && "text-violet-400 font-semibold",
                     !isDone && !isCurrent && "text-gray-400"
                   )}
                 >
@@ -194,18 +194,18 @@ function AiProcessingScreen({
       </div>
 
       {/* Architecture */}
-      <div className="bg-white rounded-2xl p-6 mb-8 border border-gray-200 shadow-sm">
+      <div className="bg-[#12121a] rounded-2xl p-6 mb-8 border border-white/10 ">
         <div className="flex items-center justify-center gap-4 flex-wrap">
-          <div className="px-4 py-2 rounded-xl bg-blue-50 border border-blue-100">
-            <span className="text-xs font-bold text-blue-600">SOURCE</span>
+          <div className="px-4 py-2 rounded-xl bg-violet-500/10 border border-violet-500/15">
+            <span className="text-xs font-bold text-violet-400">SOURCE</span>
           </div>
           <ArrowRight className="w-4 h-4 text-gray-300" />
           <div className="px-4 py-2 rounded-xl bg-cyan-50 border border-cyan-100">
             <span className="text-xs font-bold text-cyan-600">AI ENGINE</span>
           </div>
           <ArrowRight className="w-4 h-4 text-gray-300" />
-          <div className="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-100">
-            <span className="text-xs font-bold text-emerald-600">
+          <div className="px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-100">
+            <span className="text-xs font-bold text-emerald-400">
               {selectedOutputs.length} OUTPUTS
             </span>
           </div>
@@ -221,11 +221,11 @@ function AiProcessingScreen({
             return (
               <div
                 key={fmt}
-                className="bg-white rounded-xl p-4 text-center border border-gray-200 animate-fade-in-up"
+                className="bg-[#12121a] rounded-xl p-4 text-center border border-white/10 animate-fade-in-up"
                 style={{ animationDelay: `${i * 0.15}s` }}
               >
                 <format.icon className="w-6 h-6 mx-auto mb-2 text-gray-400" />
-                <span className="text-[10px] font-bold text-gray-600 block">
+                <span className="text-[10px] font-bold text-gray-400 block">
                   {format.name}
                 </span>
               </div>
@@ -240,15 +240,15 @@ function AiProcessingScreen({
 // ── Consistency Display ──────────────────────────────────────────────────
 function ConsistencyDisplay({ result }: { result: ConsistencyResult }) {
   const getScoreColor = (s: number) =>
-    s >= 90 ? "text-emerald-600" : s >= 70 ? "text-amber-600" : "text-red-500";
+    s >= 90 ? "text-emerald-400" : s >= 70 ? "text-amber-600" : "text-red-500";
   const getScoreBg = (s: number) =>
-    s >= 90 ? "bg-emerald-500" : s >= 70 ? "bg-amber-500" : "bg-red-500";
+    s >= 90 ? "bg-emerald-500/100" : s >= 70 ? "bg-amber-500" : "bg-red-500/100";
 
   return (
-    <div className="bg-white rounded-2xl p-5 mb-6 border border-gray-200 shadow-sm">
+    <div className="bg-[#12121a] rounded-2xl p-5 mb-6 border border-white/10 ">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-blue-500" /> Quality Analysis
+        <h3 className="text-sm font-bold text-white flex items-center gap-2">
+          <BarChart3 className="w-4 h-4 text-violet-400" /> Quality Analysis
         </h3>
         <div className="flex items-center gap-2">
           <span
@@ -285,7 +285,7 @@ function ConsistencyDisplay({ result }: { result: ConsistencyResult }) {
                 {item.score}%
               </span>
             </div>
-            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
               <div
                 className={cn(
                   "h-full rounded-full transition-all duration-700",
@@ -298,7 +298,7 @@ function ConsistencyDisplay({ result }: { result: ConsistencyResult }) {
         ))}
       </div>
       {result.issues.length > 0 && (
-        <div className="border-t border-gray-100 pt-3">
+        <div className="border-t border-white/5 pt-3">
           <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">
             {result.issues.length} issue
             {result.issues.length !== 1 ? "s" : ""} detected
@@ -310,11 +310,11 @@ function ConsistencyDisplay({ result }: { result: ConsistencyResult }) {
                 className={cn(
                   "text-[11px] px-2.5 py-1.5 rounded-lg",
                   issue.severity === "high" &&
-                    "bg-red-50 text-red-600 border border-red-100",
+                    "bg-red-500/10 text-red-400 border border-red-100",
                   issue.severity === "medium" &&
                     "bg-amber-50 text-amber-600 border border-amber-100",
                   issue.severity === "low" &&
-                    "bg-gray-50 text-gray-500 border border-gray-100"
+                    "bg-white/[0.03] text-gray-500 border border-white/5"
                 )}
               >
                 <span className="font-bold uppercase">{issue.severity}</span>{" "}
@@ -762,10 +762,10 @@ export default function TransformPage() {
       {/* Crisis Template Modal */}
       {showCrisisTemplates && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-3xl max-h-[80vh] overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="bg-[#12121a] rounded-2xl border border-white/10 shadow-xl w-full max-w-3xl max-h-[80vh] overflow-hidden">
+            <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="text-lg font-bold text-white">
                   Crisis Response Templates
                 </h2>
                 <p className="text-sm text-gray-500 mt-0.5">
@@ -774,7 +774,7 @@ export default function TransformPage() {
               </div>
               <button
                 onClick={() => setShowCrisisTemplates(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/5 hover:text-gray-400 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -785,12 +785,12 @@ export default function TransformPage() {
                   <button
                     key={template.id}
                     onClick={() => loadCrisisTemplate(template)}
-                    className="text-left p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-all group"
+                    className="text-left p-4 rounded-xl border border-white/10 hover:border-violet-500/30 hover:bg-violet-500/10/50 transition-all group"
                   >
                     <div className="flex items-start gap-3">
                       <span className="text-2xl">{template.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
+                        <h3 className="text-sm font-bold text-white group-hover:text-violet-400 transition-colors">
                           {template.name}
                         </h3>
                         <p className="text-xs text-gray-400 mt-1 line-clamp-2">
@@ -800,7 +800,7 @@ export default function TransformPage() {
                           {template.defaultOutputs.slice(0, 3).map((output) => (
                             <span
                               key={output}
-                              className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600"
+                              className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/5 text-gray-400"
                             >
                               {output}
                             </span>
@@ -821,7 +821,7 @@ export default function TransformPage() {
         <div className="max-w-3xl mx-auto animate-fade-in-up">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-white">
                 New Transformation
               </h1>
               <p className="text-sm text-gray-500 mt-1">
@@ -838,7 +838,7 @@ export default function TransformPage() {
               </button>
               <button
                 onClick={loadDemo}
-                className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-violet-400 bg-violet-500/10 border border-violet-500/20 rounded-xl hover:bg-violet-500/10 transition-colors"
               >
                 <Zap className="w-3.5 h-3.5" /> Try Demo
               </button>
@@ -858,8 +858,8 @@ export default function TransformPage() {
                 className={cn(
                   "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all",
                   activeTab === tab.id
-                    ? "bg-blue-50 text-blue-700 border border-blue-200"
-                    : "bg-gray-50 text-gray-400 border border-gray-200 hover:bg-gray-100"
+                    ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
+                    : "bg-white/[0.03] text-gray-400 border border-white/10 hover:bg-white/5"
                 )}
               >
                 <tab.icon className="w-3.5 h-3.5" />
@@ -875,7 +875,7 @@ export default function TransformPage() {
               value={sourceContent}
               onChange={(e) => setSourceContent(e.target.value)}
               placeholder="Paste your source content here — articles, reports, advisories, research papers, announcements, or any organizational information..."
-              className="w-full h-72 p-4 text-sm text-gray-900 bg-white border border-gray-200 rounded-2xl resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400 leading-relaxed transition-all"
+              className="w-full h-72 p-4 text-sm text-white bg-white/5 border border-white/10 rounded-2xl resize-none focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 placeholder:text-gray-400 leading-relaxed transition-all"
             />
             {sourceContent.length > 0 && (
               <div className="absolute bottom-3 right-4 flex items-center gap-3">
@@ -885,7 +885,7 @@ export default function TransformPage() {
                 </span>
                 <button
                   onClick={() => setSourceContent("")}
-                  className="text-[10px] text-gray-400 hover:text-gray-700 transition-colors"
+                  className="text-[10px] text-gray-400 hover:text-gray-300 transition-colors"
                 >
                   Clear
                 </button>
@@ -896,10 +896,10 @@ export default function TransformPage() {
 
           {/* Tab: URL */}
           {activeTab === "url" && (
-          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+          <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
             <div className="flex items-center gap-2 mb-4">
-              <Link2 className="w-5 h-5 text-blue-500" />
-              <h3 className="text-sm font-semibold text-gray-900">Fetch from URL</h3>
+              <Link2 className="w-5 h-5 text-violet-400" />
+              <h3 className="text-sm font-semibold text-white">Fetch from URL</h3>
             </div>
             <div className="flex gap-2">
               <input
@@ -907,7 +907,7 @@ export default function TransformPage() {
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 placeholder="https://example.com/article-or-report"
-                className="flex-1 px-4 py-3 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400"
+                className="flex-1 px-4 py-3 text-sm text-white bg-white/[0.03] border border-white/10 rounded-xl focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 placeholder:text-gray-400"
                 onKeyDown={(e) => e.key === "Enter" && handleFetchUrl()}
               />
               <button
@@ -916,8 +916,8 @@ export default function TransformPage() {
                 className={cn(
                   "px-5 py-3 rounded-xl text-sm font-semibold transition-all flex items-center gap-2",
                   urlInput.trim() && !isFetchingUrl
-                    ? "bg-blue-600 text-white hover:bg-blue-700 shadow-md"
-                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    ? "bg-violet-600 text-white hover:bg-blue-700 shadow-md"
+                    : "bg-white/5 text-gray-400 cursor-not-allowed"
                 )}
               >
                 {isFetchingUrl ? <Loader2 className="w-4 h-4 animate-spin" /> : <Link2 className="w-4 h-4" />}
@@ -932,8 +932,8 @@ export default function TransformPage() {
           {activeTab === "document" && (
           <div
             className={cn(
-              "bg-white rounded-2xl p-6 border-2 border-dashed transition-all",
-              isDragOver ? "border-blue-400 bg-blue-50" : "border-gray-200"
+              "bg-[#12121a] rounded-2xl p-6 border-2 border-dashed transition-all",
+              isDragOver ? "border-blue-400 bg-violet-500/10" : "border-white/10"
             )}
             onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
             onDragLeave={() => setIsDragOver(false)}
@@ -941,9 +941,9 @@ export default function TransformPage() {
           >
             <div className="text-center">
               <Upload className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-gray-900 mb-1">Drop files here or click to browse</h3>
+              <h3 className="text-sm font-semibold text-white mb-1">Drop files here or click to browse</h3>
               <p className="text-[11px] text-gray-400 mb-4">Supports PDF, DOCX, PPTX, TXT — Max 10MB per file</p>
-              <label className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-medium cursor-pointer hover:bg-blue-100 transition-colors">
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded-xl text-sm font-medium cursor-pointer hover:bg-violet-500/10 transition-colors">
                 <Upload className="w-4 h-4" />
                 Choose Files
                 <input type="file" className="hidden" multiple accept=".pdf,.docx,.pptx,.txt,.doc" onChange={(e) => handleFileUpload(e.target.files)} />
@@ -952,10 +952,10 @@ export default function TransformPage() {
             {uploadedFiles.length > 0 && (
               <div className="mt-4 space-y-2">
                 {uploadedFiles.map((f, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                    <FileText className="w-5 h-5 text-blue-500 shrink-0" />
+                  <div key={i} className="flex items-center gap-3 p-3 bg-white/[0.03] rounded-xl border border-white/5">
+                    <FileText className="w-5 h-5 text-violet-400 shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900 truncate">{f.name}</p>
+                      <p className="text-sm text-white truncate">{f.name}</p>
                       <p className="text-[10px] text-gray-400">{(f.size / 1024).toFixed(1)} KB</p>
                     </div>
                     <button onClick={() => removeUploadedFile(i)} className="text-gray-400 hover:text-red-500 transition-colors">
@@ -970,12 +970,12 @@ export default function TransformPage() {
 
           {/* Tab: Media */}
           {activeTab === "media" && (
-          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+          <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
             <div className="text-center">
               <Image className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-gray-900 mb-1">Upload Images or Videos</h3>
+              <h3 className="text-sm font-semibold text-white mb-1">Upload Images or Videos</h3>
               <p className="text-[11px] text-gray-400 mb-4">Supports PNG, JPG, GIF, MP4, WebM — Max 50MB per file</p>
-              <label className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-medium cursor-pointer hover:bg-blue-100 transition-colors">
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded-xl text-sm font-medium cursor-pointer hover:bg-violet-500/10 transition-colors">
                 <Upload className="w-4 h-4" />
                 Choose Media
                 <input type="file" className="hidden" multiple accept="image/*,video/*" onChange={(e) => handleFileUpload(e.target.files)} />
@@ -986,9 +986,9 @@ export default function TransformPage() {
                 {uploadedFiles.map((f, i) => (
                   <div key={i} className="relative group">
                     {f.preview ? (
-                      <img src={f.preview} alt={f.name} className="w-full h-32 object-cover rounded-xl border border-gray-200" />
+                      <img src={f.preview} alt={f.name} className="w-full h-32 object-cover rounded-xl border border-white/10" />
                     ) : (
-                      <div className="w-full h-32 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center">
+                      <div className="w-full h-32 bg-white/[0.03] rounded-xl border border-white/10 flex items-center justify-center">
                         <Video className="w-8 h-8 text-gray-300" />
                       </div>
                     )}
@@ -996,7 +996,7 @@ export default function TransformPage() {
                       <p className="text-[10px] text-white truncate">{f.name}</p>
                     </div>
                     <button onClick={() => removeUploadedFile(i)} className="absolute top-2 right-2 w-6 h-6 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <X className="w-3 h-3 text-gray-600" />
+                      <X className="w-3 h-3 text-gray-400" />
                     </button>
                   </div>
                 ))}
@@ -1008,7 +1008,7 @@ export default function TransformPage() {
           <div className="flex items-center justify-between mt-4">
             <button
               onClick={() => setSourceContent(sampleSource)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-violet-400 bg-violet-500/10 rounded-xl hover:bg-violet-500/10 transition-colors"
             >
               <Wand2 className="w-4 h-4" /> Random Sample
             </button>
@@ -1018,8 +1018,8 @@ export default function TransformPage() {
               className={cn(
                 "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all",
                 sourceContent.trim()
-                  ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/25"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  ? "bg-violet-600 text-white hover:bg-blue-700 shadow-lg shadow-violet-500/25"
+                  : "bg-white/5 text-gray-400 cursor-not-allowed"
               )}
             >
               Analyze Source <ArrowRight className="w-4 h-4" />
@@ -1033,7 +1033,7 @@ export default function TransformPage() {
         <div className="max-w-3xl mx-auto animate-fade-in-up">
           <StepIndicator current={2} />
           {isAnalyzing ? (
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+            <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10 ">
               <div className="space-y-3">
                 {[
                   "Source received",
@@ -1056,15 +1056,15 @@ export default function TransformPage() {
                       {isDone ? (
                         <Check className="w-4 h-4 text-emerald-500 shrink-0" />
                       ) : isCurrent ? (
-                        <Loader2 className="w-4 h-4 text-blue-500 shrink-0 animate-spin" />
+                        <Loader2 className="w-4 h-4 text-violet-400 shrink-0 animate-spin" />
                       ) : (
                         <Circle className="w-4 h-4 text-gray-200 shrink-0" />
                       )}
                       <span
                         className={cn(
                           "text-sm",
-                          isDone && "text-emerald-600 font-medium",
-                          isCurrent && "text-blue-600 font-semibold",
+                          isDone && "text-emerald-400 font-medium",
+                          isCurrent && "text-violet-400 font-semibold",
                           !isDone && !isCurrent && "text-gray-400"
                         )}
                       >
@@ -1080,8 +1080,8 @@ export default function TransformPage() {
             </div>
           ) : context ? (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <h2 className="text-lg font-bold text-gray-900 mb-1">
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10 ">
+                <h2 className="text-lg font-bold text-white mb-1">
                   AI Understanding
                 </h2>
                 <p className="text-sm text-gray-500 mb-6">
@@ -1099,12 +1099,12 @@ export default function TransformPage() {
                   ].map((item) => (
                     <div
                       key={item.label}
-                      className="p-4 rounded-xl bg-gray-50 border border-gray-100"
+                      className="p-4 rounded-xl bg-white/[0.03] border border-white/5"
                     >
                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                         {item.label}
                       </span>
-                      <p className="text-sm font-semibold text-gray-900 mt-1">
+                      <p className="text-sm font-semibold text-white mt-1">
                         {item.value}
                       </p>
                     </div>
@@ -1118,9 +1118,9 @@ export default function TransformPage() {
                     {context.key_facts.map((fact, i) => (
                       <div
                         key={i}
-                        className="flex items-start gap-2 text-sm text-gray-600"
+                        className="flex items-start gap-2 text-sm text-gray-400"
                       >
-                        <Check className="w-3.5 h-3.5 text-blue-500 mt-0.5 shrink-0" />
+                        <Check className="w-3.5 h-3.5 text-violet-400 mt-0.5 shrink-0" />
                         {fact}
                       </div>
                     ))}
@@ -1134,7 +1134,7 @@ export default function TransformPage() {
                     {context.recommendations.slice(0, 3).map((rec, i) => (
                       <div
                         key={i}
-                        className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-sm text-gray-600"
+                        className="p-3 rounded-xl bg-violet-500/10 border border-violet-500/15 text-sm text-gray-400"
                       >
                         {rec}
                       </div>
@@ -1145,7 +1145,7 @@ export default function TransformPage() {
               <div className="flex justify-end">
                 <button
                   onClick={() => setStep(3)}
-                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25"
+                  className="flex items-center gap-2 px-6 py-3 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-violet-500/25"
                 >
                   Select Outputs <ArrowRight className="w-4 h-4" />
                 </button>
@@ -1160,7 +1160,7 @@ export default function TransformPage() {
         <div className="max-w-4xl mx-auto animate-fade-in-up">
           <StepIndicator current={3} />
           <div className="mb-6">
-            <h2 className="text-lg font-bold text-gray-900">
+            <h2 className="text-lg font-bold text-white">
               What do you want to create?
             </h2>
             <p className="text-sm text-gray-500 mt-1">
@@ -1177,15 +1177,15 @@ export default function TransformPage() {
                   className={cn(
                     "flex items-start gap-3 p-4 rounded-xl border text-left transition-all",
                     isSelected
-                      ? "bg-blue-50 border-blue-200 shadow-md shadow-blue-500/5"
-                      : "bg-white border-gray-200 hover:border-gray-300"
+                      ? "bg-violet-500/10 border-violet-500/20 shadow-md shadow-violet-500/5"
+                      : "bg-white/5 border-white/10 hover:border-white/20"
                   )}
                 >
                   <div
                     className={cn(
                       "mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all",
                       isSelected
-                        ? "bg-blue-600 border-blue-600"
+                        ? "bg-violet-600 border-blue-600"
                         : "border-gray-300"
                     )}
                   >
@@ -1196,14 +1196,14 @@ export default function TransformPage() {
                       <fmt.icon
                         className={cn(
                           "w-4 h-4 shrink-0",
-                          isSelected ? "text-blue-600" : "text-gray-400"
+                          isSelected ? "text-violet-400" : "text-gray-400"
                         )}
                         style={!isSelected ? { color: fmt.color } : undefined}
                       />
                       <span
                         className={cn(
                           "text-sm font-semibold",
-                          isSelected ? "text-gray-900" : "text-gray-600"
+                          isSelected ? "text-white" : "text-gray-400"
                         )}
                       >
                         {fmt.name}
@@ -1217,8 +1217,8 @@ export default function TransformPage() {
           </div>
 
           {/* Config */}
-          <div className="bg-white rounded-2xl p-6 mb-8 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-bold text-gray-900 mb-4">
+          <div className="bg-[#12121a] rounded-2xl p-6 mb-8 border border-white/10 ">
+            <h3 className="text-sm font-bold text-white mb-4">
               Generation Controls
             </h3>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1242,8 +1242,8 @@ export default function TransformPage() {
                         className={cn(
                           "px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all",
                           config.audiences.includes(a)
-                            ? "bg-blue-50 text-blue-700 border-blue-200"
-                            : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
+                            ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
+                            : "bg-white/[0.03] text-gray-400 border-white/10 hover:border-white/20"
                         )}
                       >
                         {config.audiences.includes(a) && "✓ "}
@@ -1273,8 +1273,8 @@ export default function TransformPage() {
                       className={cn(
                         "px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all",
                         config.tone === t
-                          ? "bg-blue-50 text-blue-700 border-blue-200"
-                          : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
+                          ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
+                          : "bg-white/[0.03] text-gray-400 border-white/10 hover:border-white/20"
                       )}
                     >
                       {config.tone === t && "● "}
@@ -1292,7 +1292,7 @@ export default function TransformPage() {
                   onChange={(e) =>
                     setConfig((c) => ({ ...c, language: e.target.value }))
                   }
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  className="w-full px-3 py-2 bg-white/[0.03] border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                 >
                   {["English", "Hindi", "Spanish", "French", "German"].map(
                     (l) => (
@@ -1317,8 +1317,8 @@ export default function TransformPage() {
                       className={cn(
                         "flex-1 px-3 py-2 rounded-lg text-[11px] font-medium border transition-all",
                         config.detail === d
-                          ? "bg-blue-50 text-blue-700 border-blue-200"
-                          : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
+                          ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
+                          : "bg-white/[0.03] text-gray-400 border-white/10 hover:border-white/20"
                       )}
                     >
                       {d}
@@ -1346,8 +1346,8 @@ export default function TransformPage() {
                         className={cn(
                           "px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all",
                           config.objectives.includes(o)
-                            ? "bg-blue-50 text-blue-700 border-blue-200"
-                            : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
+                            ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
+                            : "bg-white/[0.03] text-gray-400 border-white/10 hover:border-white/20"
                         )}
                       >
                         {config.objectives.includes(o) && "✓ "}
@@ -1370,8 +1370,8 @@ export default function TransformPage() {
                         className={cn(
                           "px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all",
                           contentStyle === s
-                            ? "bg-blue-50 text-blue-700 border-blue-200"
-                            : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
+                            ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
+                            : "bg-white/[0.03] text-gray-400 border-white/10 hover:border-white/20"
                         )}
                       >
                         {contentStyle === s && "● "}
@@ -1387,14 +1387,14 @@ export default function TransformPage() {
           <div className="flex items-center justify-between">
             <button
               onClick={() => setStep(1)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-400">
                 {selectedOutputs.length > 0 ? (
-                  <span className="text-blue-600 font-bold">
+                  <span className="text-violet-400 font-bold">
                     {selectedOutputs.length}
                   </span>
                 ) : (
@@ -1408,8 +1408,8 @@ export default function TransformPage() {
                 className={cn(
                   "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-lg",
                   selectedOutputs.length > 0
-                    ? "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/25"
-                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    ? "bg-violet-600 text-white hover:bg-blue-700 shadow-violet-500/25"
+                    : "bg-white/5 text-gray-400 cursor-not-allowed"
                 )}
               >
                 <Sparkles className="w-4 h-4" /> Transform Content
@@ -1431,10 +1431,10 @@ export default function TransformPage() {
           ) : results ? (
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-sm text-emerald-600 font-medium mb-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 font-medium mb-4">
                   <CheckCircle className="w-4 h-4" /> Transformation Complete
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-2xl font-bold text-white mb-2">
                   {results.length} deliverable
                   {results.length !== 1 ? "s" : ""} generated from 1 source
                 </h2>
@@ -1463,8 +1463,8 @@ export default function TransformPage() {
                       className={cn(
                         "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all shrink-0",
                         activeResultTab === output.format
-                          ? "bg-blue-600 text-white shadow-sm"
-                          : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                          ? "bg-violet-600 text-white "
+                          : "bg-white text-gray-400 border border-white/10 hover:bg-white/[0.03]"
                       )}
                     >
                       <Icon className="w-3.5 h-3.5" />
@@ -1475,12 +1475,12 @@ export default function TransformPage() {
               </div>
 
               {activeOutput && (
-                <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
-                    <h3 className="text-sm font-bold text-gray-900">
+                <div className="bg-[#12121a] rounded-2xl overflow-hidden border border-white/10 ">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-white/5">
+                    <h3 className="text-sm font-bold text-white">
                       {activeOutput.title}
                     </h3>
-                    <span className="text-[10px] text-emerald-600 font-medium px-2 py-0.5 bg-emerald-50 border border-emerald-200 rounded-full">
+                    <span className="text-[10px] text-emerald-400 font-medium px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                       ✓ Validated
                     </span>
                   </div>
@@ -1489,15 +1489,15 @@ export default function TransformPage() {
                       <textarea
                         value={editedContent}
                         onChange={(e) => setEditedContent(e.target.value)}
-                        className="w-full h-96 p-4 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 font-mono leading-relaxed"
+                        className="w-full h-96 p-4 text-sm text-white bg-white/[0.03] border border-white/10 rounded-xl resize-none focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 font-mono leading-relaxed"
                       />
                     ) : (
-                      <pre className="text-sm text-gray-600 whitespace-pre-wrap font-sans leading-relaxed">
+                      <pre className="text-sm text-gray-400 whitespace-pre-wrap font-sans leading-relaxed">
                         {activeOutput.content}
                       </pre>
                     )}
                   </div>
-                  <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50">
+                  <div className="flex items-center justify-between px-5 py-3 border-t border-white/5 bg-white/[0.03]">
                     <div className="flex items-center gap-2 flex-wrap">
                       {editedContent !== null ? (
                         <>
@@ -1506,13 +1506,13 @@ export default function TransformPage() {
                               setEditedContent(null);
                               toast("Changes saved");
                             }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
                           >
                             <CheckCircle className="w-3.5 h-3.5" /> Save
                           </button>
                           <button
                             onClick={() => setEditedContent(null)}
-                            className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                            className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-white transition-colors"
                           >
                             Cancel
                           </button>
@@ -1521,14 +1521,14 @@ export default function TransformPage() {
                         <>
                           <button
                             onClick={() => handleCopy(activeOutput.content)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors"
                           >
                             <Copy className="w-3.5 h-3.5" /> Copy
                           </button>
                           <button
                             onClick={() => handleExport(activeOutput)}
                             disabled={isExporting}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-violet-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
                           >
                             <Download className="w-3.5 h-3.5" /> Export
                           </button>
@@ -1536,7 +1536,7 @@ export default function TransformPage() {
                             onClick={() =>
                               setEditedContent(activeOutput.content)
                             }
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors"
                           >
                             ✏️ Edit
                           </button>
@@ -1546,7 +1546,7 @@ export default function TransformPage() {
                     <button
                       onClick={() => handleRegenerate(activeOutput.format)}
                       disabled={isTransforming}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 border border-blue-200 rounded-lg transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-violet-400 hover:bg-violet-500/10 border border-violet-500/20 rounded-lg transition-colors disabled:opacity-50"
                     >
                       <RefreshCw className={cn("w-3.5 h-3.5", isTransforming && "animate-spin")} /> Regenerate
                     </button>
@@ -1557,13 +1557,13 @@ export default function TransformPage() {
               <div className="flex items-center justify-between mt-8">
                 <button
                   onClick={() => setStep(3)}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-white transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" /> Edit Config
                 </button>
                 <button
                   onClick={reset}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-violet-500/25"
                 >
                   <Wand2 className="w-4 h-4" /> New Transformation
                 </button>
