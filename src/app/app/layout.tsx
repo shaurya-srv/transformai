@@ -186,20 +186,25 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
 
   return (
     <>
-    <header className="fixed top-0 left-0 lg:left-[260px] right-0 h-14 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5 z-30 flex items-center px-4 gap-3">
-      {/* Mobile menu toggle */}
+    <header className="fixed top-0 left-0 lg:left-[260px] right-0 h-14 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5 z-30 flex items-center px-4">
+      {/* Left: Mobile menu toggle + spacer */}
       <button
-        onClick={onMenuToggle}          className="lg:hidden text-gray-400 hover:text-white p-1"
+        onClick={onMenuToggle}
+        className="lg:hidden text-gray-400 hover:text-white p-1 mr-3"
       >
         <Menu className="w-5 h-5" />
       </button>
 
-      {/* Search */}
-      <div className="flex-1 max-w-md">
+      {/* Left spacer */}
+      <div className="flex-1" />
+
+      {/* Center: Search bar */}
+      <div className="w-full max-w-md mx-4">
         <button
           onClick={() => setShowSearch(true)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-400 hover:text-white hover:border-white/20 transition-all w-full max-w-xs"
-        >            <Search className="w-3.5 h-3.5" />
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-400 hover:text-white hover:border-white/20 transition-all w-full"
+        >
+          <Search className="w-3.5 h-3.5" />
           <span>Search...</span>
           <kbd className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-500 font-mono">
             ⌘K
@@ -207,7 +212,11 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
         </button>
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* Right spacer */}
+      <div className="flex-1" />
+
+      {/* Right: Icons */}
+      <div className="flex items-center gap-1">
         {/* Notifications */}
         <div className="relative">
           <button
