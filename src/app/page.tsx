@@ -22,6 +22,11 @@ import {
   Users,
   TrendingUp,
 } from "lucide-react";
+import { ParticleCanvas } from "@/components/ParticleCanvas";
+import { AuroraBackground } from "@/components/AuroraBackground";
+import { GlitchText } from "@/components/GlitchText";
+import { TypewriterText } from "@/components/TypewriterText";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 // ── Floating Nav ─────────────────────────────────────────────────────────
 function Navbar() {
@@ -669,7 +674,9 @@ function AnimatedCounter({
 // ── Main Landing Page ────────────────────────────────────────────────────
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] grid-bg noise">
+    <div className="min-h-screen bg-[#0a0a0f] grid-bg noise relative">
+      <AuroraBackground />
+      <ParticleCanvas />
       <Navbar />
 
       {/* ═══ HERO ═══════════════════════════════════════════════════════ */}
@@ -687,18 +694,23 @@ export default function LandingPage() {
             </div>
 
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.05] tracking-tight mb-6">
-              ONE SOURCE.
+              <GlitchText text="ONE SOURCE." />
               <br />
-              <span className="gradient-text">INFINITE</span>
+              <span className="gradient-text"><GlitchText text="INFINITE" /></span>
               <br />
-              COMMUNICATION.
+              <GlitchText text="COMMUNICATION." />
             </h1>
 
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
-              Transform complex information into publication-ready content,
-              briefings, advisories, presentations and multimedia — powered
-              by AI.
-            </p>
+            <div className="text-lg text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed h-6">
+              <TypewriterText
+                texts={[
+                  "Transform complex information into publication-ready content.",
+                  "One source. Seven deliverables. Seconds.",
+                  "AI-powered content transformation engine.",
+                  "From incident reports to LinkedIn posts instantly.",
+                ]}
+              />
+            </div>
 
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               <Link
@@ -735,7 +747,9 @@ export default function LandingPage() {
       </section>
 
       {/* ═══ SHOWCASE SLIDESHOW ════════════════════════════════════════ */}
-      <ShowcaseSlideshow />
+      <ScrollReveal direction="up" delay={100}>
+        <ShowcaseSlideshow />
+      </ScrollReveal>
 
       {/* ═══ PROBLEM ════════════════════════════════════════════════════ */}
       <section className="py-24 px-6 relative">

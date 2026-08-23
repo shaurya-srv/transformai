@@ -365,3 +365,18 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform, opacity;
 }
+
+/* ── Glitch effect ─────────────────────────────────────────────────── */
+@keyframes glitch-skew {
+  0% { transform: skew(0deg); }
+  20% { transform: skew(-2deg); }
+  40% { transform: skew(1deg); }
+  60% { transform: skew(-1deg); }
+  80% { transform: skew(0.5deg); }
+  100% { transform: skew(0deg); }
+}
+
+/* ── Smooth scroll for entire page ─────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
