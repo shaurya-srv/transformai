@@ -48,9 +48,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             key={t.id}
             className={cn(
               "flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border backdrop-blur-sm animate-toast-in",
-              t.type === "success" && "bg-white border-emerald-200 text-emerald-700",
-              t.type === "error" && "bg-white border-red-200 text-red-600",
-              t.type === "info" && "bg-white border-blue-200 text-blue-600"
+              t.type === "success" && "bg-[#12121a]/95 border-emerald-500/20 text-emerald-400",
+              t.type === "error" && "bg-[#12121a]/95 border-red-500/20 text-red-400",
+              t.type === "info" && "bg-[#12121a]/95 border-violet-500/20 text-violet-400"
             )}
           >
             {t.type === "success" && <CheckCircle className="w-4 h-4 shrink-0" />}

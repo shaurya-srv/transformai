@@ -50,13 +50,13 @@ function Sidebar({
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 h-16 border-b border-gray-200">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+      <div className="flex items-center gap-3 px-5 h-16 border-b border-white/5">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-md shadow-violet-500/25 shrink-0">
           <Zap className="w-4 h-4 text-white" />
         </div>
         {!collapsed && (
           <div>
-            <span className="text-sm font-bold text-gray-900">TransformAI</span>
+            <span className="text-sm font-bold text-white">TransformAI</span>
           </div>
         )}
       </div>
@@ -75,15 +75,15 @@ function Sidebar({
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
                 isActive
-                  ? "bg-blue-50 text-blue-700 border border-blue-100"
-                  : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                  ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
+                  : "text-gray-400 hover:text-white hover:bg-white/5"
               )}
               title={collapsed ? item.label : undefined}
             >
               <item.icon
                 className={cn(
                   "w-4.5 h-4.5 shrink-0",
-                  isActive ? "text-blue-600" : "text-gray-400"
+                  isActive ? "text-violet-400" : "text-gray-500"
                 )}
               />
               {!collapsed && <span>{item.label}</span>}
@@ -96,7 +96,7 @@ function Sidebar({
       <div className="px-3 pb-4">
         <button
           onClick={onToggle}
-          className="hidden lg:flex items-center justify-center w-full py-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors mb-2"
+          className="hidden lg:flex items-center justify-center w-full py-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-colors mb-2"
         >
           <ChevronDown
             className={cn(
@@ -114,7 +114,7 @@ function Sidebar({
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col fixed left-0 top-0 h-screen bg-white border-r border-gray-200 z-40 transition-all duration-300",
+          "hidden lg:flex flex-col fixed left-0 top-0 h-screen bg-[#0a0a0f]/90 backdrop-blur-xl border-r border-white/5 z-40 transition-all duration-300",
           collapsed ? "w-[72px]" : "w-[260px]"
         )}
       >
@@ -125,7 +125,7 @@ function Sidebar({
       {mobileOpen && (
         <>
           <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden" onClick={onMobileClose} />
-          <aside className="fixed left-0 top-0 h-screen w-[260px] bg-white border-r border-gray-200 z-50 lg:hidden shadow-xl">
+          <aside className="fixed left-0 top-0 h-screen w-[260px] bg-[#0a0a0f]/95 backdrop-blur-xl border-r border-white/5 z-50 lg:hidden shadow-xl">
             <div className="flex items-center justify-end px-3 pt-3">
               <button onClick={onMobileClose} className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100">
                 <X className="w-5 h-5" />
@@ -186,11 +186,10 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
 
   return (
     <>
-    <header className="fixed top-0 left-0 lg:left-[260px] right-0 h-14 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-30 flex items-center px-4 gap-3">
+    <header className="fixed top-0 left-0 lg:left-[260px] right-0 h-14 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5 z-30 flex items-center px-4 gap-3">
       {/* Mobile menu toggle */}
       <button
-        onClick={onMenuToggle}
-        className="lg:hidden text-gray-400 hover:text-gray-700 p-1"
+        onClick={onMenuToggle}          className="lg:hidden text-gray-400 hover:text-white p-1"
       >
         <Menu className="w-5 h-5" />
       </button>
@@ -199,11 +198,10 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
       <div className="flex-1 max-w-md">
         <button
           onClick={() => setShowSearch(true)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-all w-full max-w-xs"
-        >
-          <Search className="w-3.5 h-3.5" />
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-400 hover:text-white hover:border-white/20 transition-all w-full max-w-xs"
+        >            <Search className="w-3.5 h-3.5" />
           <span>Search...</span>
-          <kbd className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 font-mono">
+          <kbd className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-500 font-mono">
             ⌘K
           </kbd>
         </button>
@@ -214,31 +212,31 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
         <div className="relative">
           <button
             onClick={() => { setShowNotifications(!showNotifications); setShowProfile(false); }}
-            className="relative p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+            className="relative p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
           >
             <Bell className="w-4 h-4" />
             {notifications.some(n => n.unread) && (
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-blue-500" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-violet-500" />
             )}
           </button>
           {showNotifications && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
-              <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-50 animate-fade-in">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                  <span className="text-sm font-semibold text-gray-900">Notifications</span>
-                  <span className="text-xs text-blue-600 cursor-pointer hover:text-blue-700">Mark all read</span>
+              <div className="absolute right-0 top-full mt-2 w-80 bg-[#12121a] border border-white/10 rounded-xl shadow-xl z-50 animate-fade-in backdrop-blur-xl">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                  <span className="text-sm font-semibold text-white">Notifications</span>
+                  <span className="text-xs text-violet-400 cursor-pointer hover:text-violet-300">Mark all read</span>
                 </div>
                 <div className="max-h-72 overflow-y-auto">
                   {notifications.map(n => (
-                    <div key={n.id} className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors ${n.unread ? "bg-blue-50/50" : ""}`}>
-                      <p className="text-sm text-gray-900 leading-snug">{n.text}</p>
-                      <p className="text-[11px] text-gray-400 mt-1">{n.time}</p>
+                    <div key={n.id} className={`px-4 py-3 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors ${n.unread ? "bg-violet-500/5" : ""}`}>
+                      <p className="text-sm text-gray-200 leading-snug">{n.text}</p>
+                      <p className="text-[11px] text-gray-500 mt-1">{n.time}</p>
                     </div>
                   ))}
                 </div>
-                <div className="px-4 py-2 border-t border-gray-100 text-center">
-                  <button className="text-xs text-blue-600 hover:text-blue-700 font-medium">View all notifications</button>
+                <div className="px-4 py-2 border-t border-white/5 text-center">
+                  <button className="text-xs text-violet-400 hover:text-violet-300 font-medium">View all notifications</button>
                 </div>
               </div>
             </>
@@ -249,31 +247,31 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
         <div className="relative">
           <button
             onClick={() => { setShowHelp(!showHelp); setShowProfile(false); }}
-            className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"
+            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors text-sm font-medium"
           >
             ?
           </button>
           {showHelp && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowHelp(false)} />
-              <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-xl z-50 p-5 animate-fade-in">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">Help & Resources</h3>
+              <div className="absolute right-0 top-full mt-2 w-72 bg-[#12121a] border border-white/10 rounded-xl shadow-xl z-50 p-5 animate-fade-in backdrop-blur-xl">
+                <h3 className="text-sm font-semibold text-white mb-3">Help & Resources</h3>
                 <div className="space-y-2">
-                  <button onClick={() => { router.push("/app/transform"); setShowHelp(false); }} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                  <button onClick={() => { router.push("/app/transform"); setShowHelp(false); }} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
                     🚀 Quick Start Guide
                   </button>
-                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
                     📖 Documentation
                   </button>
-                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
                     💬 Contact Support
                   </button>
-                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
                     ⌨️ Keyboard Shortcuts
                   </button>
                 </div>
-                <div className="mt-4 pt-3 border-t border-gray-100">
-                  <p className="text-[11px] text-gray-400">TransformAI v1.0 — Smart India Hackathon 2026</p>
+                <div className="mt-4 pt-3 border-t border-white/5">
+                  <p className="text-[11px] text-gray-500">TransformAI v1.0 — Smart India Hackathon 2026</p>
                 </div>
               </div>
             </>
@@ -286,7 +284,7 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
             onClick={() => { setShowProfile(!showProfile); setShowNotifications(false); setShowHelp(false); }}
             className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
               <span className="text-[10px] font-bold text-white">
                 {user?.name?.charAt(0) || "U"}
               </span>
@@ -297,16 +295,16 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
           {showProfile && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowProfile(false)} />
-              <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50 animate-fade-in">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
+              <div className="absolute right-0 top-full mt-2 w-56 bg-[#12121a] border border-white/10 rounded-xl shadow-xl py-1 z-50 animate-fade-in backdrop-blur-xl">
+                <div className="px-4 py-3 border-b border-white/5">
+                  <p className="text-sm font-medium text-white truncate">{user?.name}</p>
                   <p className="text-[11px] text-gray-400 truncate">{user?.email}</p>
-                  {user?.organization && <p className="text-[11px] text-gray-400 truncate mt-0.5">{user.organization}</p>}
+                  {user?.organization && <p className="text-[11px] text-gray-500 truncate mt-0.5">{user.organization}</p>}
                 </div>
                 <div className="py-1">
                   <Link
                     href="/app/settings"
-                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
                     onClick={() => setShowProfile(false)}
                   >
                     <User className="w-4 h-4" />
@@ -314,17 +312,17 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
                   </Link>
                   <Link
                     href="/app/settings"
-                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
                     onClick={() => setShowProfile(false)}
                   >
                     <Settings className="w-4 h-4" />
                     Settings
                   </Link>
                 </div>
-                <div className="border-t border-gray-100 py-1">
+                <div className="border-t border-white/5 py-1">
                   <button
                     onClick={() => { logout(); setShowProfile(false); }}
-                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full"
+                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors w-full"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out
@@ -340,9 +338,9 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
     {/* Search Modal */}
     {showSearch && (
       <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]">
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowSearch(false)} />
-        <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-200 z-10 animate-fade-in">
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowSearch(false)} />
+        <div className="relative w-full max-w-lg bg-[#12121a]/95 rounded-2xl shadow-2xl border border-white/10 z-10 animate-fade-in backdrop-blur-xl">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
             <Search className="w-5 h-5 text-gray-400" />
             <input
               autoFocus
@@ -350,9 +348,9 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search projects, templates, pages..."
-              className="flex-1 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
+              className="flex-1 text-sm text-white placeholder:text-gray-500 outline-none bg-transparent"
             />
-            <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 font-mono">ESC</kbd>
+            <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-500 font-mono">ESC</kbd>
           </div>
           <div className="max-h-64 overflow-y-auto p-2">
             {filteredSuggestions.length > 0 ? (
@@ -360,14 +358,14 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
                 <button
                   key={i}
                   onClick={s.action}
-                  className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition-colors flex items-center gap-2"
+                  className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:bg-violet-500/10 hover:text-violet-400 transition-colors flex items-center gap-2"
                 >
-                  <Search className="w-3.5 h-3.5 text-gray-400" />
+                  <Search className="w-3.5 h-3.5 text-gray-500" />
                   {s.label}
                 </button>
               ))
             ) : (
-              <p className="text-sm text-gray-400 text-center py-6">No results found</p>
+              <p className="text-sm text-gray-500 text-center py-6">No results found</p>
             )}
           </div>
         </div>
@@ -391,10 +389,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-          <span className="text-sm text-gray-500">Loading TransformAI...</span>
+          <Loader2 className="w-8 h-8 text-violet-500 animate-spin" />
+          <span className="text-sm text-gray-400">Loading TransformAI...</span>
         </div>
       </div>
     );
@@ -403,7 +401,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (!isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 grid-bg">
+    <div className="min-h-screen bg-[#0a0a0f] grid-bg noise">
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
