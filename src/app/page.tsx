@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Zap,
   ArrowRight,
@@ -348,6 +348,279 @@ function LaptopMockup() {
   );
 }
 
+// ── Showcase Slideshow ────────────────────────────────────────────────
+function ShowcaseSlideshow() {
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const slides = [
+    {
+      tag: "THE PROBLEM",
+      title: "One source. Seven deliverables. Every time.",
+      desc: "Paste any source — articles, reports, incidents, policies. TransformAI understands the content and generates all formats simultaneously from a shared context.",
+      visual: (
+        <div className="relative w-full h-48 flex items-center justify-center">
+          <div className="absolute w-[120px] h-[120px] rounded-2xl bg-gradient-to-br from-violet-600 to-cyan-600 flex items-center justify-center shadow-xl shadow-violet-500/20 animate-node-pulse">
+            <div className="text-center">
+              <Layers className="w-8 h-8 text-white mx-auto mb-1" />
+              <span className="text-[10px] font-bold text-white">SOURCE</span>
+            </div>
+          </div>
+          {[
+            { x: -160, y: -60, label: "LinkedIn", color: "#0a66c2" },
+            { x: 160, y: -60, label: "Advisory", color: "#f59e0b" },
+            { x: -160, y: 60, label: "Video", color: "#ef4444" },
+            { x: 160, y: 60, label: "Slides", color: "#8b5cf6" },
+            { x: 0, y: -90, label: "X Thread", color: "#94a3b8" },
+            { x: 0, y: 90, label: "Infographic", color: "#10b981" },
+            { x: -200, y: 0, label: "Exec Summary", color: "#06b6d4" },
+          ].map((n, i) => (
+            <div key={i} className="absolute animate-fade-in" style={{ left: `calc(50% + ${n.x}px)`, top: `calc(50% + ${n.y}px)`, animationDelay: `${i * 0.15}s` }}>
+              <div className="px-2 py-1 rounded-lg text-[8px] font-bold backdrop-blur-sm" style={{ background: `${n.color}15`, border: `1px solid ${n.color}30`, color: n.color }}>
+                {n.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      tag: "LINKEDIN OUTPUT",
+      title: "Professional posts. Ready to publish.",
+      desc: "Hook, body, call-to-action, and hashtags — all generated from the source with perfect factual accuracy.",
+      visual: (
+        <div className="w-full max-w-md mx-auto">
+          <div className="bg-[#12121a] rounded-xl border border-white/10 p-4 shadow-xl">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500" />
+              <div>
+                <div className="text-[10px] font-bold text-white/80">Your Company</div>
+                <div className="text-[7px] text-white/30">Cybersecurity · 2h</div>
+              </div>
+            </div>
+            <div className="space-y-2 text-[9px] text-white/50 leading-relaxed">
+              <p className="text-white/70">🚨 <span className="font-bold text-white/80">Critical Security Alert: VPN Vulnerability Under Active Attack</span></p>
+              <p>A severe remote code execution vulnerability (CVE-2024-38816, CVSS 9.8) has been found in NovaTech SecureConnect VPN Gateway — and it&apos;s already being exploited.</p>
+              <div className="space-y-1">
+                <p>📌 Affects versions 4.2.0 through 4.5.3</p>
+                <p>📌 Unauthenticated code execution</p>
+                <p>📌 Active exploitation confirmed</p>
+              </div>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {"#CyberSecurity #VPN #InfoSec #CVE2024".split(" ").map((h) => (
+                  <span key={h} className="text-[7px] text-cyan-400/70">{h}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      tag: "CONSISTENCY SCORING",
+      title: "Prove every output is accurate.",
+      desc: "Our engine compares all outputs against the source and each other — flagging contradictions, missing facts, and hallucinations.",
+      visual: (
+        <div className="w-full max-w-md mx-auto space-y-3">
+          {[
+            { name: "LinkedIn Post", grounding: 94, consistency: 96, issues: 0 },
+            { name: "Advisory", grounding: 98, consistency: 97, issues: 0 },
+            { name: "Video Script", grounding: 91, consistency: 93, issues: 1 },
+            { name: "Presentation", grounding: 95, consistency: 94, issues: 0 },
+          ].map((o) => (
+            <div key={o.name} className="bg-[#12121a] rounded-lg border border-white/10 p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-medium text-white/70">{o.name}</span>
+                <span className={`text-[8px] px-1.5 py-0.5 rounded-full ${o.issues === 0 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border border-amber-500/20"}`}>
+                  {o.issues === 0 ? "✓ Validated" : `⚠ ${o.issues} issue`}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <div className="text-[6px] text-white/25 mb-1">Source Grounding</div>
+                  <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full" style={{ width: `${o.grounding}%` }} />
+                  </div>
+                  <div className="text-[7px] text-emerald-400 mt-0.5">{o.grounding}%</div>
+                </div>
+                <div>
+                  <div className="text-[6px] text-white/25 mb-1">Cross-Output Consistency</div>
+                  <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-cyan-500 to-violet-500 rounded-full" style={{ width: `${o.consistency}%` }} />
+                  </div>
+                  <div className="text-[7px] text-emerald-400 mt-0.5">{o.consistency}%</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      tag: "PRESENTATION OUTPUT",
+      title: "Board-ready slides. Generated in seconds.",
+      desc: "Full PowerPoint decks with speaker notes, branded styling, and structured content — downloaded as real .pptx files.",
+      visual: (
+        <div className="w-full max-w-md mx-auto">
+          <div className="flex gap-3">
+            {/* Slide thumbnails */}
+            <div className="space-y-2 shrink-0">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div key={n} className={`w-16 h-10 rounded-md border ${n === 1 ? "border-violet-500/50 bg-violet-500/10" : "border-white/10 bg-white/5"} flex items-center justify-center`}>
+                  <span className="text-[7px] text-white/30">{n}</span>
+                </div>
+              ))}
+            </div>
+            {/* Main slide */}
+            <div className="flex-1 bg-[#12121a] rounded-xl border border-white/10 p-4 shadow-xl">
+              <div className="text-[10px] font-bold text-white/80 mb-2">CVE-2024-38816</div>
+              <div className="text-[8px] font-semibold text-white/60 mb-3">Critical VPN Vulnerability — Immediate Response Required</div>
+              <div className="space-y-1.5">
+                {["CVSS 9.8 — Critical Severity", "Affects 11 versions (4.2.0 → 4.5.3)", "Patch available: v4.5.4", "Active exploitation confirmed"].map((point) => (
+                  <div key={point} className="flex items-center gap-1.5">
+                    <div className="w-1 h-1 rounded-full bg-violet-400" />
+                    <span className="text-[7px] text-white/40">{point}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 pt-2 border-t border-white/5 text-[6px] text-white/20">Speaker: "This briefing addresses a critical security vulnerability..."</div>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      tag: "MULTI-FORMAT",
+      title: "One click. Every format.",
+      desc: "Select LinkedIn, Advisory, Video, Presentation, Infographic, X Thread, and Executive Summary — all generated simultaneously.",
+      visual: (
+        <div className="w-full max-w-md mx-auto grid grid-cols-2 gap-2">
+          {[
+            { icon: "📱", name: "LinkedIn Post", words: "284 words", color: "#0a66c2" },
+            { icon: "🐦", name: "X/Twitter Thread", words: "180 words", color: "#94a3b8" },
+            { icon: "📋", name: "Security Advisory", words: "1,240 words", color: "#f59e0b" },
+            { icon: "🎬", name: "Video Script", words: "890 words", color: "#ef4444" },
+            { icon: "📊", name: "Presentation", words: "6 slides", color: "#8b5cf6" },
+            { icon: "🖼️", name: "Infographic Spec", words: "320 words", color: "#10b981" },
+          ].map((o) => (
+            <div key={o.name} className="bg-[#12121a] rounded-lg border border-white/10 p-3 flex items-center gap-2.5 hover:border-white/20 transition-all cursor-default">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${o.color}15`, border: `1px solid ${o.color}25` }}>
+                <span className="text-sm">{o.icon}</span>
+              </div>
+              <div>
+                <div className="text-[9px] font-medium text-white/70">{o.name}</div>
+                <div className="text-[7px] text-white/30">{o.words}</div>
+              </div>
+              <div className="ml-auto">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+  ];
+
+  const nextSlide = useCallback(() => {
+    setActiveSlide((prev) => (prev + 1) % slides.length);
+  }, [slides.length]);
+
+  const prevSlide = useCallback(() => {
+    setActiveSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  }, [slides.length]);
+
+  useEffect(() => {
+    if (isPaused) return;
+    timerRef.current = setInterval(nextSlide, 5000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [isPaused, nextSlide]);
+
+  const current = slides[activeSlide];
+
+  return (
+    <section className="py-24 px-6 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-violet-950/10 to-transparent pointer-events-none" />
+      <div className="max-w-6xl mx-auto relative z-10">
+        {/* Section header */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+            See TransformAI <span className="gradient-text">in action</span>
+          </h2>
+          <p className="text-gray-400 max-w-xl mx-auto">
+            Explore how a single source becomes seven professional deliverables — with built-in accuracy scoring.
+          </p>
+        </div>
+
+        {/* Slideshow container */}
+        <div
+          className="relative"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          <div className="glass-card rounded-2xl overflow-hidden">
+            {/* Tag + Title area */}
+            <div className="grid lg:grid-cols-2 gap-0">
+              {/* Left: Text content */}
+              <div className="p-8 lg:p-10 flex flex-col justify-center">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] text-violet-400 font-bold uppercase tracking-wider mb-4 w-fit">
+                  {current.tag}
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-white leading-tight mb-4 whitespace-pre-line">
+                  {current.title}
+                </h3>
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  {current.desc}
+                </p>
+              </div>
+
+              {/* Right: Visual */}
+              <div className="p-6 lg:p-8 flex items-center justify-center bg-white/[0.02] border-l border-white/5">
+                <div className="w-full animate-fade-in" key={activeSlide}>
+                  {current.visual}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom bar: navigation + progress */}
+            <div className="flex items-center gap-4 px-8 py-4 border-t border-white/5">
+              <button onClick={prevSlide} className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">
+                ←
+              </button>
+              <button onClick={nextSlide} className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">
+                →
+              </button>
+
+              <div className="flex-1 flex items-center gap-2">
+                {slides.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveSlide(i)}
+                    className="flex-1 h-1 rounded-full overflow-hidden transition-all"
+                    style={{ background: "rgba(255,255,255,0.08)" }}
+                  >
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: i === activeSlide ? "100%" : "0%",
+                        background: "linear-gradient(90deg, #8b5cf6, #06b6d4)",
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <span className="text-[10px] text-white/30 font-mono">
+                {activeSlide + 1}/{slides.length}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── Animated Counter ─────────────────────────────────────────────────────
 function AnimatedCounter({
   end,
@@ -460,6 +733,9 @@ export default function LandingPage() {
           <LaptopMockup />
         </div>
       </section>
+
+      {/* ═══ SHOWCASE SLIDESHOW ════════════════════════════════════════ */}
+      <ShowcaseSlideshow />
 
       {/* ═══ PROBLEM ════════════════════════════════════════════════════ */}
       <section className="py-24 px-6 relative">
