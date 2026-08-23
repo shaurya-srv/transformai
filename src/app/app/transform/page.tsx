@@ -45,6 +45,7 @@ import {
   type ConsistencyResult,
 } from "@/lib/consistencyEngine";
 import { supabase } from "@/lib/supabase";
+import { playCompletionFanfare } from "@/lib/sounds";
 
 // ── Step Indicator ───────────────────────────────────────────────────────
 const steps = [
@@ -701,6 +702,7 @@ export default function TransformPage() {
     setResults(generated);
     if (context) setConsistencyResult(analyzeConsistency(context, generated));
     setIsTransforming(false);
+    playCompletionFanfare();
     if (generated.length > 0) setActiveResultTab(generated[0].format);
     toast(`${generated.length} deliverables generated!`, "success");
   };

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { playGlassChime } from "@/lib/sounds";
 import { supabase } from "@/lib/supabase";
 import { Zap, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 
@@ -28,6 +29,7 @@ export default function LoginPage() {
     const result = await login(email, password);
     setIsLoading(false);
     if (result.success) {
+      playGlassChime();
       router.push("/app");
     } else {
       setError(result.error || "Login failed.");
@@ -71,6 +73,7 @@ export default function LoginPage() {
     }
 
     setIsLoading(false);
+      playGlassChime();
     router.push("/app");
   };
 

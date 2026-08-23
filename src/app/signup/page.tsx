@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { playGlassChime } from "@/lib/sounds";
 import { Zap, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 
 function getPasswordStrength(password: string): { score: number; label: string; color: string } {
@@ -40,7 +41,7 @@ export default function SignupPage() {
     setIsLoading(true);
     const result = await signup({ name: form.name, email: form.email, password: form.password, organization: form.organization });
     setIsLoading(false);
-    if (result.success) { setSuccess("Account created! Check your email for a confirmation link."); setTimeout(() => router.push("/login"), 2000); }
+    if (result.success) { setSuccess("Account created! Check your email for a confirmation link."); playGlassChime(); setTimeout(() => router.push("/login"), 2000); }
     else { setError(result.error || "Signup failed."); }
   };
 
