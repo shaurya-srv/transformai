@@ -28,7 +28,7 @@ import { GlitchText } from "@/components/GlitchText";
 import { TypewriterText } from "@/components/TypewriterText";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { HeroEffects } from "@/components/HeroEffects";
-import { TrustedBy, BeforeAfter, LiveMetrics, Testimonials, WorkflowPipeline } from "@/components/ProfessionalSections";
+import { BeforeAfter, LiveMetrics, Testimonials, WorkflowPipeline } from "@/components/ProfessionalSections";
 
 // ── Floating Nav ─────────────────────────────────────────────────────────
 function Navbar() {
@@ -749,8 +749,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-n      {/* ═══ TRUSTED BY ═══════════════════════════════════════════════ */}
-      <TrustedBy />
       {/* ═══ SHOWCASE SLIDESHOW ════════════════════════════════════════ */}
       <ScrollReveal direction="up" delay={100}>
         <ShowcaseSlideshow />
