@@ -1,5 +1,254 @@
-// Sample source content for demo
-export const sampleSource = `CRITICAL SECURITY ADVISORY — ACTIVE EXPLOITATION DETECTED
+// ── Random Demo Sources ──────────────────────────────────────────────────
+export const randomDemoSources: Array<{
+  title: string;
+  source: string;
+  outputs: string[];
+  tone: string;
+  audiences: string[];
+  objectives: string[];
+  style: string;
+}> = [
+  {
+    title: "Healthcare Data Breach",
+    source: `DATA BREACH NOTIFICATION — CONFIDENTIAL PATIENT INFORMATION
+
+Organization: Metro Health Systems
+Date of Breach: August 10, 2024
+Date Discovered: August 18, 2024
+
+SUMMARY
+Metro Health Systems has experienced a data breach affecting approximately 85,000 patients. The breach involved unauthorized access to electronic health records through a compromised third-party vendor API.
+
+AFFECTED DATA
+- Patient names, dates of birth, and Social Security numbers
+- Medical record numbers and diagnosis codes
+- Insurance information and treatment histories
+- Prescription records for approximately 12,000 patients
+
+WHAT HAPPENED
+An unauthorized actor gained access to a third-party API integration used for claims processing. The API vulnerability allowed access to patient records without proper authentication tokens. The access occurred between August 10-17, 2024.
+
+WHAT WE ARE DOING
+- Engaged cybersecurity forensics firm CrowdStrike
+- Notified HHS Office for Civil Rights
+- Secured the vulnerable API endpoint
+- Implementing enhanced API authentication requirements
+- Offering 24 months of free credit monitoring to affected patients
+
+AFFECTED INDIVIDUALS SHOULD
+- Monitor insurance statements for unauthorized claims
+- Place fraud alerts with credit bureaus
+- Report suspicious medical bills to our breach hotline
+- Visit metrohealth.com/breach for updates
+
+Contact: breach-response@metrohealth.com | 1-800-555-0199`,
+    outputs: ["advisory", "linkedin", "executive"],
+    tone: "Urgent",
+    audiences: ["General", "Executive"],
+    objectives: ["Alert", "Inform"],
+    style: "Corporate",
+  },
+  {
+    title: "AI Policy Announcement",
+    source: `POLICY ANNOUNCEMENT — ARTIFICIAL INTELLIGENCE GOVERNANCE FRAMEWORK
+
+Effective Date: September 1, 2024
+Issued by: Office of the Chief Technology Officer
+Applies to: All departments and divisions
+
+OVERVIEW
+The organization is adopting a comprehensive AI Governance Framework to ensure responsible, transparent, and ethical use of artificial intelligence technologies across all business operations.
+
+KEY POLICY PROVISIONS
+
+1. AI USE CASE REGISTER
+All departments must register AI use cases in the central AI Registry before deployment. This includes machine learning models, natural language processing tools, computer vision systems, and automated decision-making systems.
+
+2. RISK CLASSIFICATION
+AI systems are classified into three tiers:
+- Tier 1 (Low Risk): Internal tools with no direct impact on individuals
+- Tier 2 (Medium Risk): Systems that influence business decisions
+- Tier 3 (High Risk): Systems affecting employee rights, customer outcomes, or regulatory compliance
+
+3. MANDATORY REQUIREMENTS
+- All Tier 2 and Tier 3 AI systems require bias audits quarterly
+- Human-in-the-loop approval required for automated decisions affecting individuals
+- AI-generated content must be clearly labeled
+- Model training data must be documented and traceable
+- Annual AI ethics training for all employees
+
+4. GOVERNANCE COMMITTEE
+An AI Ethics Review Board will oversee implementation, comprising representatives from Legal, IT, HR, Data Science, and external ethics advisors.
+
+5. ENFORCEMENT
+Non-compliance may result in system suspension, disciplinary action, and regulatory reporting where required.
+
+For questions, contact ai-governance@organization.com`,
+    outputs: ["linkedin", "executive", "presentation"],
+    tone: "Professional",
+    audiences: ["Executive", "General"],
+    objectives: ["Inform", "Educate"],
+    style: "Formal",
+  },
+  {
+    title: "Product Launch — Smart Water Grid",
+    source: `PRODUCT LAUNCH ANNOUNCEMENT
+
+Product: AquaSense Smart Water Grid Platform
+Launch Date: September 15, 2024
+Company: HydroTech Solutions
+
+OVERVIEW
+HydroTech Solutions today announced the launch of AquaSense, an AI-powered smart water grid management platform designed to reduce water waste by up to 40% in urban distribution networks.
+
+KEY FEATURES
+- Real-time leak detection using IoT sensors and ML algorithms
+- Predictive maintenance for water infrastructure
+- Dynamic pressure optimization to reduce pipe stress
+- Consumer-facing dashboard for water usage insights
+- Integration with existing SCADA systems
+- Automated regulatory compliance reporting
+
+MARKET OPPORTUNITY
+- Global smart water market projected to reach $31.2B by 2028
+- 40% of urban water systems lose 20-30% of treated water to leaks
+- Municipalities face increasing regulatory pressure to reduce waste
+- Current solutions are fragmented and lack AI integration
+
+EARLY ADOPTERS
+Three pilot programs have demonstrated results:
+- City of Portland: 34% reduction in non-revenue water loss
+- Singapore Public Utilities Board: 28% reduction in pipe bursts
+- Thames Water (UK): 22% improvement in pressure management
+
+PRICING
+- SaaS platform starting at $15,000/month for municipalities
+- Enterprise licensing available for water utilities
+- Free pilot program for qualifying organizations
+
+QUOTES
+"Water is the next critical infrastructure frontier. AquaSense brings AI-powered intelligence to a sector that hasn't changed in decades." — Dr. Sarah Chen, CEO of HydroTech Solutions
+
+MEDIA CONTACT
+press@hydrotech.com | +1 (555) 234-5678`,
+    outputs: ["linkedin", "video", "executive"],
+    tone: "Conversational",
+    audiences: ["General", "Media"],
+    objectives: ["Persuade", "Engage"],
+    style: "Editorial",
+  },
+  {
+    title: "Incident Response — Cloud Outage",
+    source: `INCIDENT REPORT — CLOUD SERVICE OUTAGE
+
+Incident ID: INC-2024-0819-001
+Severity: SEV-1 (Critical)
+Status: Resolved
+Date: August 19, 2024
+Duration: 4 hours 23 minutes
+
+IMPACT SUMMARY
+A critical outage affected the primary cloud computing platform serving 2,400 enterprise customers across North America. Services were unavailable from 02:15 AM to 06:38 AM EDT.
+
+AFFECTED SERVICES
+- Virtual machine instances (us-east-1 region)
+- Object storage API endpoints
+- Database read replicas
+- CDN edge nodes in 12 cities
+- Developer console and API management portal
+
+ROOT CAUSE
+A routine certificate rotation script contained a logic error that revoked active TLS certificates before new ones were deployed. This created a cascading failure across internal service mesh communication.
+
+TIMELINE
+- 02:15 AM: Automated certificate rotation initiated
+- 02:17 AM: Service mesh health checks begin failing
+- 02:22 AM: Alerting system triggers SEV-1 escalation
+- 02:30 AM: Incident response team engaged
+- 03:00 AM: Root cause identified
+- 03:45 AM: Emergency rollback initiated
+- 05:30 AM: Certificate chain restored
+- 06:38 AM: All services confirmed operational
+
+REMEDIATION
+- Certificate rotation script patched and tested
+- Canary deployment process implemented for future rotations
+- Additional pre-flight checks added to deployment pipeline
+- Post-mortem scheduled for August 26, 2024
+
+CUSTOMER IMPACT
+- 2,400 enterprise customers affected
+- 847 support tickets generated
+- SLA credits will be automatically applied
+- Dedicated support channel opened for affected customers
+
+Contact: incident-response@cloudops.com`,
+    outputs: ["advisory", "executive", "presentation"],
+    tone: "Professional",
+    audiences: ["Executive", "Technical"],
+    objectives: ["Inform", "Alert"],
+    style: "Corporate",
+  },
+  {
+    title: "Climate Research Report",
+    source: `RESEARCH BRIEFING — CLIMATE ADAPTATION INFRASTRUCTURE
+
+Published: August 2024
+Institution: Global Climate Resilience Institute
+Report ID: GCRI-2024-08
+
+EXECUTIVE OVERVIEW
+This report examines the infrastructure investment gap for climate adaptation in coastal cities worldwide. Analysis of 150 coastal metropolitan areas reveals that current adaptation spending covers only 23% of estimated needs through 2040.
+
+KEY FINDINGS
+
+1. INVESTMENT GAP
+- Total estimated adaptation need: $3.2 trillion through 2040
+- Current committed funding: $740 billion (23%)
+- Annual shortfall: approximately $150 billion per year
+
+2. HIGHEST-RISK REGIONS
+- Southeast Asia: $890B needed, $180B committed
+- Sub-Saharan Africa: $520B needed, $95B committed
+- Caribbean Islands: $180B needed, $42B committed
+- Mediterranean Europe: $310B needed, $110B committed
+
+3. CRITICAL INFRASTRUCTURE NEEDS
+- Flood defense systems: 34% of total need
+- Water supply resilience: 22%
+- Coastal transportation: 18%
+- Energy grid hardening: 15%
+- Communication networks: 11%
+
+4. ECONOMIC CONSEQUENCES OF INACTION
+- For every $1 not invested in adaptation, $7 in damages expected by 2040
+- GDP impact in high-risk regions: 2-6% reduction by 2040
+- Displacement risk: 180 million people by 2040
+
+5. RECOMMENDATIONS
+- Establish international climate adaptation fund ($500B target)
+- Mandate climate risk disclosure for infrastructure projects
+- Accelerate nature-based solutions (mangroves, wetlands)
+- Develop parametric insurance for rapid disaster response
+- Create public-private partnerships for coastal resilience
+
+METHODOLOGY
+Analysis of World Bank, IPCC AR6, OECD infrastructure databases, and 47 peer-reviewed studies. Economic modeling conducted using integrated assessment framework (DICE-Regional).
+
+Contact: research@gcri.org`,
+    outputs: ["executive", "infographic", "presentation"],
+    tone: "Authoritative",
+    audiences: ["Executive", "Technical"],
+    objectives: ["Inform", "Educate"],
+    style: "Corporate",
+  },
+];
+
+// Sample source content for demo (first item)
+export const sampleSource = randomDemoSources[0].source;
+
+// Legacy alias for backwards compatibility
+const legacySampleSource = `CRITICAL SECURITY ADVISORY — ACTIVE EXPLOITATION DETECTED
 
 Title: Critical Vulnerability in Enterprise VPN Infrastructure (CVE-2024-38816)
 Severity: CRITICAL (CVSS 9.8)

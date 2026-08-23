@@ -33,7 +33,7 @@ import type {
   TransformationConfig,
   GeneratedOutput,
 } from "@/lib/ai";
-import { sampleSource, mockContext, mockOutputs } from "@/lib/mockData";
+import { sampleSource, mockContext, mockOutputs, randomDemoSources } from "@/lib/mockData";
 import { crisisTemplates, type CrisisTemplate } from "@/lib/crisisTemplates";
 import { generatePptx } from "@/lib/pptxGenerator";
 import {
@@ -366,17 +366,25 @@ export default function TransformPage() {
   const [sourceId, setSourceId] = useState<string | null>(null);
 
   const loadDemo = () => {
-    setSourceContent(sampleSource);
+    // Pick a random demo source
+    const idx = Math.floor(Math.random() * randomDemoSources.length);
+    const demo = randomDemoSources[idx];
+    setSourceContent(demo.source);
     setConfig({
-      audiences: ["Security Teams", "Executives"],
-      tone: "Urgent",
+      audiences: demo.audiences,
+      tone: demo.tone,
       language: "English",
       detail: "Detailed",
-      objectives: ["Alert", "Inform"],
+      objectives: demo.objectives,
     });
-    setContentStyle("Corporate");
-    setSelectedOutputs(["linkedin", "video", "advisory", "presentation"]);
-    toast("Demo loaded! Click Analyze to continue.", "info");
+    setContentStyle(demo.style);
+    setSelectedOutputs(demo.outputs);
+    toast(`Demo loaded: ${demo.title}`, "info");
+
+    // Auto-start analysis after a short delay
+    setTimeout(() => {
+      handleAnalyzeWithContent(demo.source);
+    }, 600);
   };
 
   const loadCrisisTemplate = (template: CrisisTemplate) => {
@@ -442,8 +450,58 @@ export default function TransformPage() {
     setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleAnalyzeWithContent = async (content: string) => {
+    if (!content.trim()) return;
+    setStep(2);
+    setIsAnalyzing(true);
+    setAnalysisStep(0);
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : {}),
+        },
+        body: JSON.stringify({ source: content }),
+      });
+
+      const data = await res.json();
+
+      // Animate steps
+      for (let i = 1; i <= 5; i++) {
+        await new Promise((r) => setTimeout(r, 400));
+        setAnalysisStep(i);
+      }
+
+      setContext(data.context);
+      setProjectId(data.projectId || null);
+      setSourceId(data.sourceId || null);
+      setStep(3);
+      toast("Source analyzed! Select your outputs.", "success");
+    } catch {
+      // Fallback to mock
+      for (let i = 1; i <= 5; i++) {
+        await new Promise((r) => setTimeout(r, 300));
+        setAnalysisStep(i);
+      }
+      setContext(mockContext);
+      setStep(3);
+      toast("Source analyzed (demo mode).", "info");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handleAnalyze = async () => {
     if (!sourceContent.trim()) return;
+    await handleAnalyzeWithContent(sourceContent);
     setStep(2);
     setIsAnalyzing(true);
     setAnalysisStep(0);
@@ -570,6 +628,78 @@ export default function TransformPage() {
     setIsTransforming(false);
     if (generated.length > 0) setActiveResultTab(generated[0].format);
     toast(`${generated.length} deliverables generated!`, "success");
+  };
+
+  const handleRegenerate = async (format: string) => {
+    if (!context) return;
+    setIsTransforming(true);
+    toast(`Regenerating ${format}...`, "info");
+
+    try {
+      const res = await fetch("/api/transform", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          context,
+          config,
+          outputTypes: [format],
+          projectId,
+          sourceId,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.outputs?.length > 0) {
+          setResults((prev) =>
+            prev
+              ? prev.map((o) => (o.format === format ? data.outputs[0] : o))
+              : prev
+          );
+        }
+      } else {
+        // Fallback: regenerate from mock with slight variation
+        if (mockOutputs[format]) {
+          const variations = [
+            " (Revised Edition)",
+            " (Updated)",
+            " (Refreshed)",
+          ];
+          const variation = variations[Math.floor(Math.random() * variations.length)];
+          setResults((prev) =>
+            prev
+              ? prev.map((o) =>
+                  o.format === format
+                    ? { ...o, title: mockOutputs[format].title + variation, content: mockOutputs[format].content }
+                    : o
+                )
+              : prev
+          );
+        }
+      }
+    } catch {
+      // Fallback
+      if (mockOutputs[format]) {
+        setResults((prev) =>
+          prev
+            ? prev.map((o) =>
+                o.format === format
+                  ? { ...o, content: mockOutputs[format].content }
+                  : o
+              )
+            : prev
+        );
+      }
+    } finally {
+      setIsTransforming(false);
+      toast(`${format} regenerated!`, "success");
+      if (context) {
+        const updated = results?.map((o) =>
+          o.format === format ? { ...o, regenerated: true } : o
+        ) || [];
+        setConsistencyResult(analyzeConsistency(context, updated));
+      }
+    }
   };
 
   const toggleOutput = (id: string) =>
@@ -880,7 +1010,7 @@ export default function TransformPage() {
               onClick={() => setSourceContent(sampleSource)}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors"
             >
-              <Wand2 className="w-4 h-4" /> Load Sample Advisory
+              <Wand2 className="w-4 h-4" /> Random Sample
             </button>
             <button
               onClick={handleAnalyze}
@@ -1414,16 +1544,11 @@ export default function TransformPage() {
                       )}
                     </div>
                     <button
-                      onClick={() => {
-                        toast(`Regenerating...`, "info");
-                        setTimeout(
-                          () => toast("Regeneration complete", "success"),
-                          1500
-                        );
-                      }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 border border-blue-200 rounded-lg transition-colors"
+                      onClick={() => handleRegenerate(activeOutput.format)}
+                      disabled={isTransforming}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 border border-blue-200 rounded-lg transition-colors disabled:opacity-50"
                     >
-                      <RefreshCw className="w-3.5 h-3.5" /> Regenerate
+                      <RefreshCw className={cn("w-3.5 h-3.5", isTransforming && "animate-spin")} /> Regenerate
                     </button>
                   </div>
                 </div>
