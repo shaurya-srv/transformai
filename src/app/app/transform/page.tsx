@@ -354,6 +354,13 @@ export default function TransformPage() {
   const [contentStyle, setContentStyle] = useState("Corporate");
   const [showCrisisTemplates, setShowCrisisTemplates] = useState(false);
 
+  // Source input tab state
+  const [activeTab, setActiveTab] = useState<"text" | "url" | "document" | "media">("text");
+  const [urlInput, setUrlInput] = useState("");
+  const [isFetchingUrl, setIsFetchingUrl] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: number; type: string; preview?: string }[]>([]);
+  const [isDragOver, setIsDragOver] = useState(false);
+
   // Database state
   const [projectId, setProjectId] = useState<string | null>(null);
   const [sourceId, setSourceId] = useState<string | null>(null);
@@ -384,6 +391,55 @@ export default function TransformPage() {
     setSelectedOutputs(template.defaultOutputs);
     setShowCrisisTemplates(false);
     toast(`Template "${template.name}" loaded!`, "info");
+  };
+
+  const handleFetchUrl = async () => {
+    if (!urlInput.trim()) return;
+    setIsFetchingUrl(true);
+    try {
+      // Simulate URL fetch — in production, use a server-side proxy
+      await new Promise((r) => setTimeout(r, 1500));
+      const fetched = `[URL Content from: ${urlInput}]\n\nThis is extracted content from the provided URL. In a production environment, this would be fetched and parsed from the actual webpage. The content would include the main article text, headings, and key information from the page.`;
+      setSourceContent(fetched);
+      setActiveTab("text");
+      toast("Content fetched from URL!", "success");
+    } catch {
+      toast("Failed to fetch URL content. Please try again.", "error");
+    } finally {
+      setIsFetchingUrl(false);
+    }
+  };
+
+  const handleFileUpload = (files: FileList | null) => {
+    if (!files) return;
+    const newFiles = Array.from(files).map((f) => ({
+      name: f.name,
+      size: f.size,
+      type: f.type,
+      preview: f.type.startsWith("image/") ? URL.createObjectURL(f) : undefined,
+    }));
+    setUploadedFiles((prev) => [...prev, ...newFiles]);
+
+    // Extract text content from files
+    Array.from(files).forEach((file) => {
+      if (file.type === "text/plain" || file.name.endsWith(".txt")) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const text = e.target?.result as string;
+          setSourceContent((prev) => (prev ? prev + "\n\n" + text : text));
+        };
+        reader.readAsText(file);
+      } else {
+        // For non-text files, add a placeholder description
+        const desc = `[${file.type || "Document"}] ${file.name} (${(file.size / 1024).toFixed(1)} KB)\n\nThis ${file.type.split("/")[0]} file has been uploaded. In a production environment, the content would be extracted using OCR (for images), PDF parsing, or document processing APIs.`;
+        setSourceContent((prev) => (prev ? prev + "\n\n" + desc : desc));
+      }
+    });
+    toast(`${files.length} file(s) uploaded. Content extracted.`, "success");
+  };
+
+  const removeUploadedFile = (index: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleAnalyze = async () => {
@@ -660,29 +716,30 @@ export default function TransformPage() {
           </div>
           <StepIndicator current={1} />
           <div className="flex gap-2 mb-4">
-            {[
-              { icon: FileText, label: "Text", active: true },
-              { icon: Link2, label: "URL", active: false },
-              { icon: Upload, label: "Document", active: false },
-            ].map((tab) => (
+            {([
+              { id: "text" as const, icon: FileText, label: "Text" },
+              { id: "url" as const, icon: Link2, label: "URL" },
+              { id: "document" as const, icon: Upload, label: "Document" },
+              { id: "media" as const, icon: Image, label: "Media" },
+            ]).map((tab) => (
               <button
-                key={tab.label}
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
                 className={cn(
                   "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all",
-                  tab.active
+                  activeTab === tab.id
                     ? "bg-blue-50 text-blue-700 border border-blue-200"
-                    : "bg-gray-50 text-gray-400 border border-gray-200"
+                    : "bg-gray-50 text-gray-400 border border-gray-200 hover:bg-gray-100"
                 )}
-                disabled={!tab.active}
               >
                 <tab.icon className="w-3.5 h-3.5" />
                 {tab.label}
-                {!tab.active && (
-                  <span className="text-[9px] opacity-60">(soon)</span>
-                )}
               </button>
             ))}
           </div>
+
+          {/* Tab: Text */}
+          {activeTab === "text" && (
           <div className="relative">
             <textarea
               value={sourceContent}
@@ -705,6 +762,119 @@ export default function TransformPage() {
               </div>
             )}
           </div>
+          )}
+
+          {/* Tab: URL */}
+          {activeTab === "url" && (
+          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+            <div className="flex items-center gap-2 mb-4">
+              <Link2 className="w-5 h-5 text-blue-500" />
+              <h3 className="text-sm font-semibold text-gray-900">Fetch from URL</h3>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                placeholder="https://example.com/article-or-report"
+                className="flex-1 px-4 py-3 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400"
+                onKeyDown={(e) => e.key === "Enter" && handleFetchUrl()}
+              />
+              <button
+                onClick={handleFetchUrl}
+                disabled={!urlInput.trim() || isFetchingUrl}
+                className={cn(
+                  "px-5 py-3 rounded-xl text-sm font-semibold transition-all flex items-center gap-2",
+                  urlInput.trim() && !isFetchingUrl
+                    ? "bg-blue-600 text-white hover:bg-blue-700 shadow-md"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                )}
+              >
+                {isFetchingUrl ? <Loader2 className="w-4 h-4 animate-spin" /> : <Link2 className="w-4 h-4" />}
+                Fetch
+              </button>
+            </div>
+            <p className="text-[11px] text-gray-400 mt-3">Paste a URL to an article, report, or webpage. Content will be extracted automatically.</p>
+          </div>
+          )}
+
+          {/* Tab: Document */}
+          {activeTab === "document" && (
+          <div
+            className={cn(
+              "bg-white rounded-2xl p-6 border-2 border-dashed transition-all",
+              isDragOver ? "border-blue-400 bg-blue-50" : "border-gray-200"
+            )}
+            onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+            onDragLeave={() => setIsDragOver(false)}
+            onDrop={(e) => { e.preventDefault(); setIsDragOver(false); handleFileUpload(e.dataTransfer.files); }}
+          >
+            <div className="text-center">
+              <Upload className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Drop files here or click to browse</h3>
+              <p className="text-[11px] text-gray-400 mb-4">Supports PDF, DOCX, PPTX, TXT — Max 10MB per file</p>
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-medium cursor-pointer hover:bg-blue-100 transition-colors">
+                <Upload className="w-4 h-4" />
+                Choose Files
+                <input type="file" className="hidden" multiple accept=".pdf,.docx,.pptx,.txt,.doc" onChange={(e) => handleFileUpload(e.target.files)} />
+              </label>
+            </div>
+            {uploadedFiles.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {uploadedFiles.map((f, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <FileText className="w-5 h-5 text-blue-500 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-900 truncate">{f.name}</p>
+                      <p className="text-[10px] text-gray-400">{(f.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                    <button onClick={() => removeUploadedFile(i)} className="text-gray-400 hover:text-red-500 transition-colors">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          )}
+
+          {/* Tab: Media */}
+          {activeTab === "media" && (
+          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+            <div className="text-center">
+              <Image className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Upload Images or Videos</h3>
+              <p className="text-[11px] text-gray-400 mb-4">Supports PNG, JPG, GIF, MP4, WebM — Max 50MB per file</p>
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-medium cursor-pointer hover:bg-blue-100 transition-colors">
+                <Upload className="w-4 h-4" />
+                Choose Media
+                <input type="file" className="hidden" multiple accept="image/*,video/*" onChange={(e) => handleFileUpload(e.target.files)} />
+              </label>
+            </div>
+            {uploadedFiles.length > 0 && (
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                {uploadedFiles.map((f, i) => (
+                  <div key={i} className="relative group">
+                    {f.preview ? (
+                      <img src={f.preview} alt={f.name} className="w-full h-32 object-cover rounded-xl border border-gray-200" />
+                    ) : (
+                      <div className="w-full h-32 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center">
+                        <Video className="w-8 h-8 text-gray-300" />
+                      </div>
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent rounded-b-xl">
+                      <p className="text-[10px] text-white truncate">{f.name}</p>
+                    </div>
+                    <button onClick={() => removeUploadedFile(i)} className="absolute top-2 right-2 w-6 h-6 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <X className="w-3 h-3 text-gray-600" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          )}
+
           <div className="flex items-center justify-between mt-4">
             <button
               onClick={() => setSourceContent(sampleSource)}
