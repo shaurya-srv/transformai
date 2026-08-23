@@ -27,6 +27,7 @@ import { AuroraBackground } from "@/components/AuroraBackground";
 import { GlitchText } from "@/components/GlitchText";
 import { TypewriterText } from "@/components/TypewriterText";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { HeroEffects } from "@/components/HeroEffects";
 
 // ── Floating Nav ─────────────────────────────────────────────────────────
 function Navbar() {
@@ -681,6 +682,7 @@ export default function LandingPage() {
 
       {/* ═══ HERO ═══════════════════════════════════════════════════════ */}
       <section className="relative pt-32 pb-0 px-6 overflow-hidden">
+        <HeroEffects />
         {/* Ambient glows */}
         <div className="absolute top-20 left-1/4 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[150px] pointer-events-none" />
         <div className="absolute top-40 right-1/4 w-[500px] h-[500px] bg-cyan-600/8 rounded-full blur-[130px] pointer-events-none" />
