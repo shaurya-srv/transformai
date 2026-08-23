@@ -936,7 +936,8 @@ n      {/* ═══ WORKFLOW PIPELINE ═════════════�
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* First 6 cards — symmetric 3x2 grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
             {[
               { icon: Video, title: "Video Package", desc: "Scripts, storyboards, scene descriptions, narration, and subtitles.", color: "#ef4444" },
               { icon: Share2, title: "LinkedIn Post", desc: "Professional, publication-ready social content with insights.", color: "#0a66c2" },
@@ -944,7 +945,6 @@ n      {/* ═══ WORKFLOW PIPELINE ═════════════�
               { icon: Shield, title: "Advisory", desc: "Structured professional advisory with prioritized actions.", color: "#f59e0b" },
               { icon: Image, title: "Infographic", desc: "Visual hierarchy, key statistics, and design specifications.", color: "#10b981" },
               { icon: FileText, title: "Executive Summary", desc: "Concise leadership briefing with decision points.", color: "#06b6d4" },
-              { icon: Presentation, title: "Presentation", desc: "Slide decks with speaker notes, ready for delivery.", color: "#8b5cf6" },
             ].map((fmt) => (
               <div
                 key={fmt.title}
@@ -960,6 +960,20 @@ n      {/* ═══ WORKFLOW PIPELINE ═════════════�
                 <p className="text-sm text-gray-400 leading-relaxed">{fmt.desc}</p>
               </div>
             ))}
+          </div>
+
+          {/* 7th card — centered */}
+          <div className="flex justify-center">
+            <div className="glass-card rounded-2xl p-6 group cursor-default w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.33%-0.67rem)]">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
+                style={{ background: `#8b5cf615`, border: `1px solid #8b5cf625` }}
+              >
+                <Presentation className="w-5 h-5" style={{ color: "#8b5cf6" }} />
+              </div>
+              <h3 className="text-base font-bold text-white mb-2">Presentation</h3>
+              <p className="text-sm text-gray-400 leading-relaxed">Slide decks with speaker notes, ready for delivery.</p>
+            </div>
           </div>
         </div>
       </section>
