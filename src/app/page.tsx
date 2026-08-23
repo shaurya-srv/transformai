@@ -101,102 +101,168 @@ function Navbar() {
   );
 }
 
-// ── Hero Visualization ───────────────────────────────────────────────────
-function HeroVisualization() {
-  const outputs = [
-    { icon: Video, label: "VIDEO", angle: -60, color: "#ef4444" },
-    { icon: Share2, label: "LINKEDIN", angle: -30, color: "#0a66c2" },
-    { icon: MessageSquare, label: "X THREAD", angle: 0, color: "#94a3b8" },
-    { icon: Shield, label: "ADVISORY", angle: 30, color: "#f59e0b" },
-    { icon: Image, label: "INFOGRAPHIC", angle: 60, color: "#10b981" },
-    { icon: Presentation, label: "PRESENTATION", angle: 90, color: "#8b5cf6" },
-    { icon: FileText, label: "EXEC SUMMARY", angle: 120, color: "#06b6d4" },
-  ];
+// ── Laptop Mockup ─────────────────────────────────────────────────────
+function LaptopMockup() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const rect = el.getBoundingClientRect();
+          const viewportH = window.innerHeight;
+          const progress = Math.max(0, Math.min(1, 1 - rect.top / viewportH));
+          setScrollProgress(progress);
+        }
+      },
+      { threshold: Array.from({ length: 20 }, (_, i) => i / 20) }
+    );
+    observer.observe(el);
+
+    const handleScroll = () => {
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const viewportH = window.innerHeight;
+      const progress = Math.max(0, Math.min(1, 1 - (rect.top - viewportH * 0.3) / (viewportH * 0.5)));
+      setScrollProgress(progress);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => { observer.disconnect(); window.removeEventListener("scroll", handleScroll); };
+  }, []);
+
+  const translateY = 80 - scrollProgress * 80;
+  const scale = 0.85 + scrollProgress * 0.15;
+  const opacity = 0.3 + scrollProgress * 0.7;
+  const glowIntensity = scrollProgress;
 
   return (
-    <div className="relative w-full h-[400px] lg:h-[500px] flex items-center justify-center">
-      {/* Background glows */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-[300px] h-[300px] bg-violet-500/15 rounded-full blur-[120px]" />
-      </div>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-[200px] h-[200px] bg-cyan-500/15 rounded-full blur-[100px]" />
-      </div>
+    <div ref={ref} className="relative w-full flex items-center justify-center py-12">
+      {/* Aurora glow behind device */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full transition-all duration-500"
+        style={{
+          background: `radial-gradient(ellipse, rgba(139,92,246,${0.2 * glowIntensity}) 0%, rgba(6,182,212,${0.15 * glowIntensity}) 40%, transparent 70%)`,
+          filter: `blur(${60 + glowIntensity * 40}px)`,
+          opacity: glowIntensity,
+        }}
+      />
 
-      {/* Center source node */}
-      <div className="relative z-10">
-        <div className="w-28 h-28 rounded-2xl bg-gradient-to-br from-violet-600 to-cyan-600 flex items-center justify-center shadow-xl shadow-violet-500/30 animate-node-pulse">
-          <div className="text-center">
-            <Layers className="w-7 h-7 text-white mx-auto mb-1" />
-            <span className="text-xs font-bold text-white">SOURCE</span>
+      {/* Secondary glow pulse */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full animate-glow-pulse"
+        style={{
+          background: `radial-gradient(circle, rgba(139,92,246,${0.15 * glowIntensity}) 0%, transparent 70%)`,
+          filter: "blur(40px)",
+          opacity: glowIntensity * 0.6,
+        }}
+      />
+
+      {/* Laptop frame */}
+      <div
+        className="relative z-10 transition-all duration-700 ease-out"
+        style={{
+          transform: `translateY(${translateY}px) scale(${scale})`,
+          opacity,
+        }}
+      >
+        {/* Screen bezel */}
+        <div className="relative bg-[#1a1a2e] rounded-t-2xl border border-white/10 border-b-0 overflow-hidden shadow-2xl shadow-black/50" style={{ width: "min(820px, 90vw)", height: "min(500px, 55vw)" }}>
+          {/* Top bar (notch area) */}
+          <div className="flex items-center justify-center h-7 bg-[#12121a] border-b border-white/5">
+            <div className="w-20 h-1.5 rounded-full bg-white/10" />
+          </div>
+
+          {/* Screen content — TransformAI app UI */}
+          <div className="w-full h-[calc(100%-1.75rem)] bg-[#0a0a0f] p-4 overflow-hidden">
+            {/* App top bar */}
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-5 h-5 rounded bg-gradient-to-br from-violet-500 to-cyan-500" />
+              <span className="text-[10px] font-bold text-white/80">TransformAI</span>
+              <div className="flex-1" />
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-white/5" />
+                <div className="w-4 h-4 rounded bg-white/5" />
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
+                  <span className="text-[6px] text-white font-bold">U</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              {/* Sidebar */}
+              <div className="w-32 shrink-0 space-y-1.5 hidden sm:block">
+                {["Overview", "New Transform", "Projects", "History", "Templates"].map((item, i) => (
+                  <div key={item} className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[9px] ${i === 1 ? "bg-violet-500/10 text-violet-400 border border-violet-500/20" : "text-white/30"}`}>
+                    <div className={`w-3 h-3 rounded ${i === 1 ? "bg-violet-500/30" : "bg-white/10"}`} />
+                    {item}
+                  </div>
+                ))}
+              </div>
+
+              {/* Main content */}
+              <div className="flex-1 space-y-3">
+                {/* Stats row */}
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { label: "Outputs", value: "24", color: "violet" },
+                    { label: "Sources", value: "8", color: "cyan" },
+                    { label: "Accuracy", value: "96%", color: "emerald" },
+                    { label: "Time Saved", value: "14h", color: "amber" },
+                  ].map((stat) => (
+                    <div key={stat.label} className="bg-white/[0.03] border border-white/5 rounded-lg p-2">
+                      <div className="text-[7px] text-white/30 uppercase">{stat.label}</div>
+                      <div className={`text-sm font-bold text-${stat.color}-400`}>{stat.value}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Source input area */}
+                <div className="bg-white/[0.03] border border-white/5 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="px-2 py-0.5 rounded bg-violet-500/10 text-[7px] text-violet-400 border border-violet-500/20">Text</div>
+                    <div className="px-2 py-0.5 rounded bg-white/5 text-[7px] text-white/30">URL</div>
+                    <div className="px-2 py-0.5 rounded bg-white/5 text-[7px] text-white/30">Upload</div>
+                  </div>
+                  <div className="bg-white/[0.02] border border-white/5 rounded-md p-2 h-16">
+                    <div className="text-[8px] text-white/20 leading-relaxed">
+                      CRITICAL SECURITY ADVISORY — Active exploitation detected in VPN infrastructure. CVE-2024-38816, CVSS 9.8...
+                    </div>
+                  </div>
+                </div>
+
+                {/* Output cards */}
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { icon: "📱", name: "LinkedIn Post", status: "Ready", color: "emerald" },
+                    { icon: "🎬", name: "Video Package", status: "Ready", color: "emerald" },
+                    { icon: "📋", name: "Advisory", status: "Ready", color: "emerald" },
+                    { icon: "📊", name: "Presentation", status: "Ready", color: "emerald" },
+                  ].map((output) => (
+                    <div key={output.name} className="flex items-center gap-2 bg-white/[0.03] border border-white/5 rounded-lg p-2">
+                      <span className="text-[10px]">{output.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[8px] font-medium text-white/60 truncate">{output.name}</div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                        <span className="text-[7px] text-emerald-400">{output.status}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Orbiting output nodes */}
-        {outputs.map((output, i) => {
-          const radius = 180;
-          const rad = (output.angle * Math.PI) / 180;
-          const x = Math.cos(rad) * radius;
-          const y = Math.sin(rad) * radius;
-          return (
-            <div
-              key={output.label}
-              className="absolute animate-fade-in-up"
-              style={{
-                left: `calc(50% + ${x}px - 36px)`,
-                top: `calc(50% + ${y}px - 24px)`,
-                animationDelay: `${i * 0.12}s`,
-              }}
-            >
-              {/* Connection line */}
-              <svg
-                className="absolute"
-                style={{
-                  left: 36 - x,
-                  top: 24 - y,
-                  width: Math.abs(x) + 10,
-                  height: Math.abs(y) + 10,
-                  overflow: "visible",
-                  pointerEvents: "none",
-                }}
-              >
-                <line
-                  x1={x > 0 ? 0 : Math.abs(x)}
-                  y1={y > 0 ? 0 : Math.abs(y)}
-                  x2={x > 0 ? Math.abs(x) : 0}
-                  y2={y > 0 ? Math.abs(y) : 0}
-                  stroke={output.color}
-                  strokeWidth="1"
-                  opacity="0.3"
-                  strokeDasharray="4 4"
-                />
-              </svg>
-
-              <Link
-                href="/signup"
-                className="w-[72px] h-[48px] rounded-xl flex items-center justify-center gap-1.5 backdrop-blur-sm transition-all hover:scale-110 cursor-pointer shadow-lg"
-                style={{
-                  background: `${output.color}15`,
-                  border: `1px solid ${output.color}30`,
-                  boxShadow: `0 0 20px ${output.color}15`,
-                  animation: `float ${4 + i * 0.3}s ease-in-out infinite`,
-                  animationDelay: `${i * 0.2}s`,
-                }}
-              >
-                <output.icon
-                  className="w-3.5 h-3.5"
-                  style={{ color: output.color }}
-                />
-                <span
-                  className="text-[8px] font-bold"
-                  style={{ color: output.color }}
-                >
-                  {output.label}
-                </span>
-              </Link>
-            </div>
-          );
-        })}
+        {/* Laptop base */}
+        <div className="relative">
+          <div className="bg-[#1a1a2e] h-3 rounded-b-xl border border-white/10 border-t-0" style={{ width: "calc(min(820px, 90vw) + 20px)", marginLeft: "-10px" }} />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-1 rounded-full bg-white/10" />
+        </div>
       </div>
     </div>
   );
@@ -254,68 +320,64 @@ export default function LandingPage() {
       <Navbar />
 
       {/* ═══ HERO ═══════════════════════════════════════════════════════ */}
-      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+      <section className="relative pt-32 pb-0 px-6 overflow-hidden">
         {/* Ambient glows */}
         <div className="absolute top-20 left-1/4 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[150px] pointer-events-none" />
         <div className="absolute top-40 right-1/4 w-[500px] h-[500px] bg-cyan-600/8 rounded-full blur-[130px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Text */}
-            <div className="animate-fade-in-up">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-xs text-violet-400 font-medium mb-6">
-                <Sparkles className="w-3.5 h-3.5" />
-                AI-Powered Content Transformation
-              </div>
-
-              <h1 className="text-5xl md:text-7xl font-bold text-white leading-[1.05] tracking-tight mb-6">
-                ONE SOURCE.
-                <br />
-                <span className="gradient-text">INFINITE</span>
-                <br />
-                COMMUNICATION.
-              </h1>
-
-              <p className="text-lg text-gray-400 max-w-lg mb-8 leading-relaxed">
-                Transform complex information into publication-ready content,
-                briefings, advisories, presentations and multimedia — powered
-                by AI.
-              </p>
-
-              <div className="flex flex-wrap gap-4 mb-8">
-                <Link
-                  href="/signup"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/40 hover:translate-y-[-1px]"
-                >
-                  Start Transforming
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <button
-                  onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:border-white/20 hover:bg-white/10 rounded-xl text-sm font-semibold transition-all backdrop-blur-sm"
-                >
-                  See How It Works
-                </button>
-              </div>
-
-              {/* Floating metric */}
-              <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-xl backdrop-blur-sm">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
-                  <span className="text-xs text-gray-400">7 formats</span>
-                </div>
-                <span className="text-white/20">·</span>
-                <span className="text-xs text-gray-400">1 source</span>
-                <span className="text-white/20">·</span>
-                <span className="text-xs text-cyan-400 font-semibold">seconds</span>
-              </div>
+          {/* Centered headline */}
+          <div className="text-center mb-8 animate-fade-in-up">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-xs text-violet-400 font-medium mb-6">
+              <Sparkles className="w-3.5 h-3.5" />
+              AI-Powered Content Transformation
             </div>
 
-            {/* Right: Visualization */}
-            <div className="hidden lg:block animate-fade-in-up stagger-2">
-              <HeroVisualization />
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.05] tracking-tight mb-6">
+              ONE SOURCE.
+              <br />
+              <span className="gradient-text">INFINITE</span>
+              <br />
+              COMMUNICATION.
+            </h1>
+
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
+              Transform complex information into publication-ready content,
+              briefings, advisories, presentations and multimedia — powered
+              by AI.
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              <Link
+                href="/signup"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/40 hover:translate-y-[-1px]"
+              >
+                Start Transforming
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <button
+                onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:border-white/20 hover:bg-white/10 rounded-xl text-sm font-semibold transition-all backdrop-blur-sm"
+              >
+                See How It Works
+              </button>
+            </div>
+
+            {/* Floating metric */}
+            <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-xl backdrop-blur-sm">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
+                <span className="text-xs text-gray-400">7 formats</span>
+              </div>
+              <span className="text-white/20">·</span>
+              <span className="text-xs text-gray-400">1 source</span>
+              <span className="text-white/20">·</span>
+              <span className="text-xs text-cyan-400 font-semibold">seconds</span>
             </div>
           </div>
+
+          {/* Device showcase with scroll animation */}
+          <LaptopMockup />
         </div>
       </section>
 
