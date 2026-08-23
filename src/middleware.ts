@@ -33,11 +33,20 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Helper: create redirect with refreshed cookies
+  function redirectWithCookies(targetPath: string) {
+    const url = request.nextUrl.clone();
+    url.pathname = targetPath;
+    const redirectResp = NextResponse.redirect(url);
+    response.cookies.getAll().forEach(({ name, value }) => {
+      redirectResp.cookies.set(name, value);
+    });
+    return redirectResp;
+  }
+
   // Protect /app routes — redirect to login if not authenticated
   if (!user && request.nextUrl.pathname.startsWith("/app")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+    return redirectWithCookies("/login");
   }
 
   // If authenticated and on login/signup, redirect to app
@@ -46,9 +55,7 @@ export async function middleware(request: NextRequest) {
     (request.nextUrl.pathname === "/login" ||
       request.nextUrl.pathname === "/signup")
   ) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/app";
-    return NextResponse.redirect(url);
+    return redirectWithCookies("/app");
   }
 
   return response;

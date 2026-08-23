@@ -1,13 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
+  const next = searchParams.get("next") ?? "/app";
 
   if (code) {
-    const cookieStore = await cookies();
+    let response = NextResponse.next();
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,16 +15,17 @@ export async function GET(request: Request) {
       {
         cookies: {
           getAll() {
-            return cookieStore.getAll();
+            return request.cookies.getAll();
           },
           setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) => {
-                cookieStore.set(name, value, options);
-              });
-            } catch {
-              // Cookie setting can fail in some server contexts.
-            }
+            cookiesToSet.forEach(({ name, value }) => {
+              request.cookies.set(name, value);
+            });
+            // Recreate response so cookies are included
+            response = NextResponse.next();
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options as Record<string, unknown>);
+            });
           },
         },
       }
@@ -33,7 +34,20 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      return NextResponse.redirect(`${origin}/app`);
+      // Build redirect URL, preserving x-forwarded-host behind proxies
+      const forwardedHost = request.headers.get("x-forwarded-host");
+      const url = request.nextUrl.clone();
+      if (forwardedHost) {
+        url.host = forwardedHost;
+      }
+      url.pathname = next;
+
+      // Create redirect response and copy all auth cookies onto it
+      const redirectResponse = NextResponse.redirect(url);
+      response.cookies.getAll().forEach(({ name, value }) => {
+        redirectResponse.cookies.set(name, value);
+      });
+      return redirectResponse;
     }
   }
 
