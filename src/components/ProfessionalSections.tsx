@@ -327,9 +327,13 @@ export function WorkflowPipeline() {
 
   return (
     <section className="py-24 px-6 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-violet-950/10 to-transparent pointer-events-none" />
-      <div className="max-w-5xl mx-auto relative z-10">
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-violet-500/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] text-violet-300 font-bold uppercase tracking-wider mb-4">
+            <Zap className="w-3 h-3" /> Automated Workflow
+          </div>
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
             The <span className="gradient-text">pipeline</span>
           </h2>
@@ -339,32 +343,91 @@ export function WorkflowPipeline() {
         </div>
 
         <div className="relative">
-          {/* Connecting line */}
-          <div className="absolute top-12 left-[8%] right-[8%] h-[2px] bg-gradient-to-r from-violet-500/30 via-cyan-500/30 to-violet-500/30 hidden md:block" />
+          {/* Animated connecting line with glow */}
+          <div className="absolute top-[52px] left-[8%] right-[8%] h-[3px] hidden md:block" style={{ background: "linear-gradient(90deg, rgba(139,92,246,0.4), rgba(6,182,212,0.4), rgba(139,92,246,0.4))" }} />
+          {/* Animated glow on the line */}
+          <div className="absolute top-[50px] left-[8%] right-[8%] h-[7px] hidden md:block" style={{ background: "linear-gradient(90deg, rgba(139,92,246,0.15), rgba(6,182,212,0.15), rgba(139,92,246,0.15))", filter: "blur(4px)" }} />
+          {/* Data flow dots */}
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="absolute top-[49px] hidden md:block"
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: "radial-gradient(circle, #8b5cf6 0%, #06b6d4 100%)",
+                boxShadow: "0 0 12px rgba(139,92,246,0.6), 0 0 24px rgba(6,182,212,0.3)",
+                animation: `data-flow 3s linear infinite`,
+                animationDelay: `${i * 1}s`,
+                left: "8%",
+              }}
+            />
+          ))}
 
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-4 md:gap-2">
             {steps.map((step, i) => (
               <div key={step.label} className="flex flex-col items-center text-center group">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all group-hover:scale-110 relative z-10"
-                  style={{
-                    background: `${step.color}15`,
-                    border: `1px solid ${step.color}30`,
-                    boxShadow: `0 0 20px ${step.color}10`,
-                  }}
-                >
-                  <step.icon className="w-6 h-6" style={{ color: step.color }} />
+                {/* Step number */}
+                <div className="text-[9px] font-bold text-white/20 mb-2 tracking-widest">
+                  {String(i + 1).padStart(2, "0")}
                 </div>
-                <div className="text-sm font-bold text-white mb-1">{step.label}</div>
-                <div className="text-[10px] text-gray-500 leading-snug max-w-[120px]">{step.desc}</div>
+
+                {/* Icon node with glow */}
+                <div className="relative mb-4">
+                  {/* Outer glow ring */}
+                  <div
+                    className="absolute -inset-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{ background: `radial-gradient(circle, ${step.color}20 0%, transparent 70%)` }}
+                  />
+                  {/* Node */}
+                  <div
+                    className="w-16 h-16 rounded-2xl flex items-center justify-center relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl"
+                    style={{
+                      background: `linear-gradient(135deg, ${step.color}20, ${step.color}08)`,
+                      border: `1.5px solid ${step.color}40`,
+                      boxShadow: `0 0 25px ${step.color}15, inset 0 1px 0 rgba(255,255,255,0.05)`,
+                    }}
+                  >
+                    <step.icon className="w-7 h-7" style={{ color: step.color }} />
+                  </div>
+                  {/* Pulse dot */}
+                  <div
+                    className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full z-20"
+                    style={{
+                      background: step.color,
+                      boxShadow: `0 0 8px ${step.color}80`,
+                      animation: `pulse-dot 2s ease-in-out infinite`,
+                      animationDelay: `${i * 0.3}s`,
+                    }}
+                  />
+                </div>
+
+                {/* Label */}
+                <div className="text-sm font-bold text-white mb-1 group-hover:text-white transition-colors">{step.label}</div>
+                <div className="text-[10px] text-gray-400 leading-snug max-w-[110px]">{step.desc}</div>
+
+                {/* Mobile arrow */}
                 {i < steps.length - 1 && (
-                  <ArrowRight className="w-4 h-4 text-white/10 mt-2 md:hidden" />
+                  <div className="md:hidden mt-3 flex items-center gap-1">
+                    <div className="w-8 h-[1px] bg-gradient-to-r from-transparent to-white/20" />
+                    <div className="w-0 h-0 border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent border-l-[5px] border-l-white/20" />
+                  </div>
                 )}
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes data-flow {
+          0% { left: 8%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { left: 88%; opacity: 0; }
+        }
+      `}</style>
     </section>
   );
 }
