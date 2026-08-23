@@ -126,12 +126,12 @@ export default function HistoryPage() {
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-white">History</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-400 mt-1">
             Chronological record of all transformations.
           </p>
         </div>
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-6 h-6 text-violet-400 animate-spin" />
+          <Loader2 className="w-6 h-6 text-violet-300 animate-spin" />
         </div>
       </div>
     );
@@ -141,7 +141,7 @@ export default function HistoryPage() {
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-4xl mx-auto">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">History</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-400 mt-1">
           Chronological record of all transformations.
         </p>
       </div>
@@ -152,7 +152,7 @@ export default function HistoryPage() {
           <h3 className="text-lg font-bold text-white mb-2">
             No history yet
           </h3>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-400 mb-4">
             Your transformation history will appear here.
           </p>
           <Link
@@ -166,37 +166,37 @@ export default function HistoryPage() {
         <div className="space-y-8">
           {historyData.map((group) => (
             <div key={group.period}>
-              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+              <h2 className="text-xs font-bold text-gray-300 uppercase tracking-wider mb-3">
                 {group.period}
               </h2>
               <div className="space-y-2">
                 {group.items.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-[#12121a] rounded-xl p-4 flex items-center gap-4 border border-white/10 hover:border-violet-500/20 hover:shadow-md hover:shadow-blue-500/5 transition-all group"
+                    className="bg-[#12121a] rounded-xl p-4 flex items-center gap-4 border border-white/12 hover:border-violet-500/20 hover:shadow-md hover:shadow-blue-500/5 transition-all group"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center shrink-0">
-                      <item.icon className="w-4 h-4 text-gray-400" />
+                    <div className="w-9 h-9 rounded-lg bg-white/[0.04] border border-white/8 flex items-center justify-center shrink-0">
+                      <item.icon className="w-4 h-4 text-gray-300" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-medium text-white truncate">
                         {item.name}
                       </h3>
-                      <p className="text-[11px] text-gray-400 mt-0.5">
+                      <p className="text-[11px] text-gray-300 mt-0.5">
                         {item.outputs} outputs · {item.date}
                       </p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <button className="px-3 py-1.5 text-[11px] font-medium text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors">
+                      <button className="px-3 py-1.5 text-[11px] font-medium text-violet-300 hover:bg-violet-500/15 rounded-lg transition-colors">
                         Open
                       </button>
-                      <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-300 hover:bg-white/5 transition-colors">
+                      <button className="p-1.5 rounded-lg text-gray-300 hover:text-gray-300 hover:bg-white/[0.06] transition-colors">
                         <Copy className="w-3.5 h-3.5" />
                       </button>
-                      <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-300 hover:bg-white/5 transition-colors">
+                      <button className="p-1.5 rounded-lg text-gray-300 hover:text-gray-300 hover:bg-white/[0.06] transition-colors">
                         <Download className="w-3.5 h-3.5" />
                       </button>
-                      <button className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                      <button className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>

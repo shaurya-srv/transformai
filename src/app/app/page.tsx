@@ -130,8 +130,8 @@ export default function AppDashboard() {
       value: stats.transformations || 0,
       suffix: "",
       icon: Layers,
-      color: "text-violet-400",
-      bg: "bg-violet-500/10",
+      color: "text-violet-300",
+      bg: "bg-violet-500/15",
       border: "border-violet-500/15",
       change: stats.transformations > 0 ? "Total projects" : "Start your first",
     },
@@ -175,7 +175,7 @@ export default function AppDashboard() {
           <h1 className="text-2xl font-bold text-white">
             {getGreeting()}, {user?.name?.split(" ")[0] || "there"}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-400 mt-1">
             What would you like to transform today?
           </p>
         </div>
@@ -204,7 +204,7 @@ export default function AppDashboard() {
           </div>
           <Link
             href="/app/transform"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-violet-400 rounded-xl text-sm font-bold hover:bg-violet-500/10 transition-colors shadow-lg shadow-blue-900/20 shrink-0"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-violet-300 rounded-xl text-sm font-bold hover:bg-violet-500/15 transition-colors shadow-lg shadow-blue-900/20 shrink-0"
           >
             <Wand2 className="w-4 h-4" />
             Start New Transformation
@@ -218,7 +218,7 @@ export default function AppDashboard() {
         {statCards.map((stat) => (
           <div
             key={stat.label}
-            className="bg-[#12121a] rounded-xl p-5 border border-white/10 hover:border-violet-500/20 hover:shadow-md hover:shadow-blue-500/5 transition-all"
+            className="bg-[#12121a] rounded-xl p-5 border border-white/12 hover:border-violet-500/20 hover:shadow-md hover:shadow-blue-500/5 transition-all"
           >
             <div className="flex items-center gap-3 mb-3">
               <div
@@ -226,27 +226,27 @@ export default function AppDashboard() {
               >
                 <stat.icon className={`w-4 h-4 ${stat.color}`} />
               </div>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">
                 {stat.label}
               </span>
             </div>
             <div className="text-2xl font-bold text-white">
               <AnimatedValue end={stat.value} suffix={stat.suffix} />
             </div>
-            <div className="text-[10px] text-gray-400 mt-1">{stat.change}</div>
+            <div className="text-[10px] text-gray-300 mt-1">{stat.change}</div>
           </div>
         ))}
       </div>
 
       {/* Recent Transformations */}
-      <div className="bg-[#12121a] rounded-xl border border-white/10 overflow-hidden">
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+      <div className="bg-[#12121a] rounded-xl border border-white/12 overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/8 flex items-center justify-between">
           <h3 className="text-sm font-bold text-white">
             Recent Transformations
           </h3>
           <Link
             href="/app/history"
-            className="text-xs text-violet-400 hover:text-violet-400 font-medium transition-colors"
+            className="text-xs text-violet-300 hover:text-violet-300 font-medium transition-colors"
           >
             View all →
           </Link>
@@ -280,16 +280,16 @@ export default function AppDashboard() {
               return (
                 <div
                   key={project.id}
-                  className="flex items-center gap-4 px-6 py-4 hover:bg-white/[0.03] transition-colors"
+                  className="flex items-center gap-4 px-6 py-4 hover:bg-white/[0.04] transition-colors"
                 >
-                  <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.03] border border-white/5 shrink-0">
-                    <Icon className="w-4 h-4 text-gray-400" />
+                  <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/8 shrink-0">
+                    <Icon className="w-4 h-4 text-gray-300" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-white truncate">
                       {project.name}
                     </div>
-                    <div className="text-xs text-gray-400 mt-0.5">
+                    <div className="text-xs text-gray-300 mt-0.5">
                       {outputCount} outputs ·{" "}
                       {new Date(project.created_at).toLocaleDateString()}
                     </div>
@@ -311,20 +311,20 @@ export default function AppDashboard() {
                     {formats.slice(0, 3).map((type) => (
                       <span
                         key={type}
-                        className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 text-gray-400"
+                        className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/[0.06] text-gray-300"
                       >
                         {type}
                       </span>
                     ))}
                     {formats.length > 3 && (
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 text-gray-400">
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/[0.06] text-gray-300">
                         +{formats.length - 3}
                       </span>
                     )}
                   </div>
                   <Link
                     href="/app/transform"
-                    className="text-xs font-medium text-violet-400 hover:text-violet-400 shrink-0"
+                    className="text-xs font-medium text-violet-300 hover:text-violet-300 shrink-0"
                   >
                     View →
                   </Link>
@@ -333,11 +333,11 @@ export default function AppDashboard() {
             })
           ) : (
             <div className="px-6 py-8 text-center">
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-300">
                 No transformations yet.{" "}
                 <Link
                   href="/app/transform"
-                  className="text-violet-400 hover:text-violet-400 font-medium"
+                  className="text-violet-300 hover:text-violet-300 font-medium"
                 >
                   Start your first one →
                 </Link>
@@ -349,7 +349,7 @@ export default function AppDashboard() {
 
       {/* Footer tagline */}
       <div className="text-center mt-12 pb-8">
-        <p className="text-sm font-semibold text-gray-400 tracking-wide">
+        <p className="text-sm font-semibold text-gray-300 tracking-wide">
           One Source. Infinite Communication.
         </p>
       </div>

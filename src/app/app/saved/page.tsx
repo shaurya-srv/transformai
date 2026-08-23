@@ -131,7 +131,7 @@ export default function SavedOutputsPage() {
           <h1 className="text-2xl font-bold text-white">Saved Outputs</h1>
         </div>
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-6 h-6 text-violet-400 animate-spin" />
+          <Loader2 className="w-6 h-6 text-violet-300 animate-spin" />
         </div>
       </div>
     );
@@ -141,7 +141,7 @@ export default function SavedOutputsPage() {
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-5xl mx-auto">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Saved Outputs</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-400 mt-1">
           Your library of saved transformation outputs.
         </p>
       </div>
@@ -154,8 +154,8 @@ export default function SavedOutputsPage() {
             onClick={() => setActiveCategory(cat.id)}
             className={`px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
               activeCategory === cat.id
-                ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
-                : "bg-white/5 border border-white/10 text-gray-400 hover:text-gray-400"
+                ? "bg-violet-500/15 text-violet-300 border border-violet-500/20"
+                : "bg-white/[0.06] border border-white/12 text-gray-300 hover:text-gray-300"
             }`}
           >
             {cat.label}
@@ -170,38 +170,38 @@ export default function SavedOutputsPage() {
           return (
             <div
               key={output.id}
-              className="bg-[#12121a] rounded-xl p-5 border border-white/10 hover:border-violet-500/20 hover:shadow-md hover:shadow-blue-500/5 transition-all group"
+              className="bg-[#12121a] rounded-xl p-5 border border-white/12 hover:border-violet-500/20 hover:shadow-md hover:shadow-blue-500/5 transition-all group"
             >
               <div className="flex items-start gap-3 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/15 flex items-center justify-center shrink-0">
-                  <Icon className="w-4 h-4 text-violet-400" />
+                <div className="w-8 h-8 rounded-lg bg-violet-500/15 border border-violet-500/15 flex items-center justify-center shrink-0">
+                  <Icon className="w-4 h-4 text-violet-300" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-bold text-white truncate">
                     {output.title}
                   </h3>
-                  <p className="text-[10px] text-gray-400 mt-0.5">
+                  <p className="text-[10px] text-gray-300 mt-0.5">
                     From: {output.source}
                   </p>
                 </div>
               </div>
 
-              <p className="text-xs text-gray-500 line-clamp-2 mb-4 leading-relaxed">
+              <p className="text-xs text-gray-400 line-clamp-2 mb-4 leading-relaxed">
                 {output.preview}
               </p>
 
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-gray-400">
+                <span className="text-[10px] text-gray-300">
                   {output.saved}
                 </span>
                 <div className="flex items-center gap-1">
-                  <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-300 hover:bg-white/5 transition-colors">
+                  <button className="p-1.5 rounded-lg text-gray-300 hover:text-gray-300 hover:bg-white/[0.06] transition-colors">
                     <Copy className="w-3.5 h-3.5" />
                   </button>
-                  <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-300 hover:bg-white/5 transition-colors">
+                  <button className="p-1.5 rounded-lg text-gray-300 hover:text-gray-300 hover:bg-white/[0.06] transition-colors">
                     <Download className="w-3.5 h-3.5" />
                   </button>
-                  <button className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                  <button className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -217,7 +217,7 @@ export default function SavedOutputsPage() {
           <h3 className="text-lg font-bold text-white mb-2">
             No saved outputs
           </h3>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-400 mb-4">
             Save outputs from your transformations to see them here.
           </p>
           <Link

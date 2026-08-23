@@ -66,7 +66,7 @@ export default function SettingsPage() {
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-5xl mx-auto">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-400 mt-1">
           Manage your account, preferences, and integrations.
         </p>
       </div>
@@ -81,8 +81,8 @@ export default function SettingsPage() {
                 onClick={() => setActiveSection(s.id)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
                   activeSection === s.id
-                    ? "bg-violet-500/10 text-violet-400 border border-violet-500/15"
-                    : "text-gray-400 hover:text-gray-400 hover:bg-white/[0.03]"
+                    ? "bg-violet-500/15 text-violet-300 border border-violet-500/15"
+                    : "text-gray-300 hover:text-gray-300 hover:bg-white/[0.04]"
                 }`}
               >
                 <s.icon className="w-4 h-4" />
@@ -97,7 +97,7 @@ export default function SettingsPage() {
           {/* Profile */}
           {activeSection === "profile" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/12">
                 <h2 className="text-base font-bold text-white mb-6">Profile</h2>
 
                 {/* Avatar */}
@@ -108,10 +108,10 @@ export default function SettingsPage() {
                     </span>
                   </div>
                   <div>
-                    <button className="px-3 py-1.5 text-xs font-medium text-violet-400 bg-violet-500/10 border border-violet-500/20 rounded-lg hover:bg-violet-500/10 transition-colors">
+                    <button className="px-3 py-1.5 text-xs font-medium text-violet-300 bg-violet-500/15 border border-violet-500/20 rounded-lg hover:bg-violet-500/15 transition-colors">
                       Change Photo
                     </button>
-                    <p className="text-[10px] text-gray-400 mt-1">
+                    <p className="text-[10px] text-gray-300 mt-1">
                       JPG, PNG or GIF. Max 2MB.
                     </p>
                   </div>
@@ -126,7 +126,7 @@ export default function SettingsPage() {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/12 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     />
                   </div>
                   <div>
@@ -137,7 +137,7 @@ export default function SettingsPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/12 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     />
                   </div>
                   <div>
@@ -148,7 +148,7 @@ export default function SettingsPage() {
                       type="text"
                       value={organization}
                       onChange={(e) => setOrganization(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/12 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     />
                   </div>
                 </div>
@@ -172,7 +172,7 @@ export default function SettingsPage() {
           {/* Security */}
           {activeSection === "security" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/12">
                 <h2 className="text-base font-bold text-white mb-6">Change Password</h2>
                 <div className="space-y-4 max-w-md">
                   <div>
@@ -184,12 +184,12 @@ export default function SettingsPage() {
                         type={showCurrentPw ? "text" : "password"}
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all pr-10"
+                        className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/12 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowCurrentPw(!showCurrentPw)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-400"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-300"
                       >
                         {showCurrentPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -204,12 +204,12 @@ export default function SettingsPage() {
                         type={showNewPw ? "text" : "password"}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all pr-10"
+                        className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/12 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowNewPw(!showNewPw)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-400"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-300"
                       >
                         {showNewPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -224,13 +224,13 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/12">
                 <h2 className="text-base font-bold text-white mb-4">Active Sessions</h2>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5">
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.04] border border-white/8">
                     <div>
                       <p className="text-sm text-white font-medium">Current Session</p>
-                      <p className="text-[10px] text-gray-400">Chrome · Just now</p>
+                      <p className="text-[10px] text-gray-300">Chrome · Just now</p>
                     </div>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
                       Active
@@ -247,7 +247,7 @@ export default function SettingsPage() {
           {/* AI Preferences */}
           {activeSection === "ai" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/12">
                 <h2 className="text-base font-bold text-white mb-6">AI Preferences</h2>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
@@ -258,7 +258,7 @@ export default function SettingsPage() {
                     <select
                       value={defaultLanguage}
                       onChange={(e) => setDefaultLanguage(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/12 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     >
                       {["English", "Hindi", "Spanish", "French", "German"].map((l) => (
                         <option key={l} value={l}>{l}</option>
@@ -273,7 +273,7 @@ export default function SettingsPage() {
                     <select
                       value={defaultTone}
                       onChange={(e) => setDefaultTone(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/12 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     >
                       {["Professional", "Urgent", "Authoritative", "Conversational", "Formal"].map(
                         (t) => (
@@ -289,7 +289,7 @@ export default function SettingsPage() {
                     <select
                       value={defaultAudience}
                       onChange={(e) => setDefaultAudience(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/12 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     >
                       {["General", "Executive", "Technical", "Public", "Media"].map((a) => (
                         <option key={a} value={a}>{a}</option>
@@ -303,7 +303,7 @@ export default function SettingsPage() {
                     <select
                       value={defaultDetail}
                       onChange={(e) => setDefaultDetail(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/12 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     >
                       {["Brief", "Standard", "Detailed"].map((d) => (
                         <option key={d} value={d}>{d}</option>
@@ -327,7 +327,7 @@ export default function SettingsPage() {
           {/* Notifications */}
           {activeSection === "notifications" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/12">
                 <h2 className="text-base font-bold text-white mb-6">Notifications</h2>
                 <div className="space-y-4">
                   {[
@@ -352,11 +352,11 @@ export default function SettingsPage() {
                   ].map((item) => (
                     <div
                       key={item.label}
-                      className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5"
+                      className="flex items-center justify-between p-4 rounded-xl bg-white/[0.04] border border-white/8"
                     >
                       <div>
                         <p className="text-sm font-medium text-white">{item.label}</p>
-                        <p className="text-[11px] text-gray-400 mt-0.5">{item.desc}</p>
+                        <p className="text-[11px] text-gray-300 mt-0.5">{item.desc}</p>
                       </div>
                       <button
                         onClick={() => item.onChange(!item.checked)}
@@ -380,7 +380,7 @@ export default function SettingsPage() {
           {/* Organization */}
           {activeSection === "organization" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/12">
                 <h2 className="text-base font-bold text-white mb-6">Organization</h2>
                 <div className="space-y-4">
                   <div>
@@ -390,14 +390,14 @@ export default function SettingsPage() {
                     <input
                       type="text"
                       defaultValue={user?.organization || ""}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                      className="w-full px-4 py-2.5 bg-white/[0.06] border border-white/12 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-1.5">
                       Team Members
                     </label>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-300">
                       Team collaboration features coming soon.
                     </p>
                   </div>
@@ -409,19 +409,19 @@ export default function SettingsPage() {
           {/* API */}
           {activeSection === "api" && (
             <div className="space-y-6 animate-fade-in-up">
-              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/10">
+              <div className="bg-[#12121a] rounded-2xl p-6 border border-white/12">
                 <h2 className="text-base font-bold text-white mb-6">API / Integrations</h2>
                 <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                  <div className="p-4 rounded-xl bg-white/[0.04] border border-white/8">
                     <p className="text-sm font-medium text-white mb-1">API Access</p>
-                    <p className="text-[11px] text-gray-400">
+                    <p className="text-[11px] text-gray-300">
                       Programmatic access to TransformAI is coming soon. You&apos;ll be able to
                       integrate transformations into your workflows via REST API.
                     </p>
                   </div>
-                  <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                  <div className="p-4 rounded-xl bg-white/[0.04] border border-white/8">
                     <p className="text-sm font-medium text-white mb-1">Webhooks</p>
-                    <p className="text-[11px] text-gray-400">
+                    <p className="text-[11px] text-gray-300">
                       Receive real-time notifications when transformations complete. Coming in
                       the next release.
                     </p>
