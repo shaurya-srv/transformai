@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Star,
@@ -14,64 +14,19 @@ import {
   Presentation,
   Image,
   Wand2,
+  Loader2,
 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
-const savedOutputs = [
-  {
-    id: "1",
-    title: "LinkedIn Post — CVE-2024-38816",
-    format: "linkedin",
-    category: "social",
-    source: "Critical VPN Vulnerability Advisory",
-    saved: "Today, 2:45 PM",
-    preview: "🚨 Critical Security Alert: VPN Vulnerability Under Active Attack...",
-  },
-  {
-    id: "2",
-    title: "Executive Summary — CVE-2024-38816",
-    format: "executive",
-    category: "documents",
-    source: "Critical VPN Vulnerability Advisory",
-    saved: "Today, 2:45 PM",
-    preview: "A critical security vulnerability (CVE-2024-38816) has been identified...",
-  },
-  {
-    id: "3",
-    title: "Video Package — CVE-2024-38816",
-    format: "video",
-    category: "presentations",
-    source: "Critical VPN Vulnerability Advisory",
-    saved: "Today, 2:45 PM",
-    preview: "SCENE 1 — HOOK: Critical security alert with impact animation...",
-  },
-  {
-    id: "4",
-    title: "LinkedIn Post — Q3 Policy Update",
-    format: "linkedin",
-    category: "social",
-    source: "Q3 Security Policy Update",
-    saved: "Yesterday",
-    preview: "Excited to announce our updated remote work policy...",
-  },
-  {
-    id: "5",
-    title: "Advisory — Incident Response",
-    format: "advisory",
-    category: "briefings",
-    source: "Global Incident Response Report",
-    saved: "Aug 20",
-    preview: "SECURITY ADVISORY — CRITICAL — IMMEDIATE ACTION REQUIRED...",
-  },
-  {
-    id: "6",
-    title: "Presentation — Cloud Migration",
-    format: "presentation",
-    category: "presentations",
-    source: "Cloud Migration Research Paper",
-    saved: "Aug 18",
-    preview: "SLIDE 1 — Situation Overview: Cloud Migration Strategy...",
-  },
-];
+interface SavedOutput {
+  id: string;
+  title: string;
+  format: string;
+  category: string;
+  source: string;
+  saved: string;
+  preview: string;
+}
 
 const formatIcons: Record<string, typeof Star> = {
   linkedin: Share2,
@@ -80,6 +35,17 @@ const formatIcons: Record<string, typeof Star> = {
   advisory: Shield,
   presentation: Presentation,
   infographic: Image,
+  twitter: Share2,
+};
+
+const categoryMap: Record<string, string> = {
+  linkedin: "social",
+  twitter: "social",
+  executive: "documents",
+  advisory: "briefings",
+  presentation: "presentations",
+  infographic: "presentations",
+  video: "presentations",
 };
 
 const categories = [
@@ -92,11 +58,84 @@ const categories = [
 
 export default function SavedOutputsPage() {
   const [activeCategory, setActiveCategory] = useState("all");
+  const [savedOutputs, setSavedOutputs] = useState<SavedOutput[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchSaved() {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session) {
+          setIsLoading(false);
+          return;
+        }
+
+        // Fetch outputs that are saved
+        const res = await fetch("/api/projects");
+        if (!res.ok) {
+          setIsLoading(false);
+          return;
+        }
+
+        const { projects } = await res.json();
+        if (!projects) {
+          setIsLoading(false);
+          return;
+        }
+
+        const outputs: SavedOutput[] = [];
+
+        for (const project of projects) {
+          for (const transformation of project.transformations || []) {
+            for (const output of transformation.outputs || []) {
+              if (output.is_saved) {
+                outputs.push({
+                  id: output.id,
+                  title: output.title || `${output.format} — ${project.name}`,
+                  format: output.format,
+                  category: categoryMap[output.format] || "documents",
+                  source: project.name,
+                  saved: new Date(
+                    project.created_at
+                  ).toLocaleDateString(),
+                  preview: `Generated from: ${project.name}`,
+                });
+              }
+            }
+          }
+        }
+
+        setSavedOutputs(outputs);
+      } catch {
+        // Use empty state
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchSaved();
+  }, []);
 
   const filtered =
     activeCategory === "all"
       ? savedOutputs
       : savedOutputs.filter((o) => o.category === activeCategory);
+
+  if (isLoading) {
+    return (
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-5xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">Saved Outputs</h1>
+        </div>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-5xl mx-auto">
@@ -152,7 +191,9 @@ export default function SavedOutputsPage() {
               </p>
 
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-gray-400">{output.saved}</span>
+                <span className="text-[10px] text-gray-400">
+                  {output.saved}
+                </span>
                 <div className="flex items-center gap-1">
                   <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
                     <Copy className="w-3.5 h-3.5" />
@@ -173,7 +214,9 @@ export default function SavedOutputsPage() {
       {filtered.length === 0 && (
         <div className="text-center py-16">
           <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-gray-900 mb-2">No saved outputs</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
+            No saved outputs
+          </h3>
           <p className="text-sm text-gray-500 mb-4">
             Save outputs from your transformations to see them here.
           </p>

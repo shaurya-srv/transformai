@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -9,57 +9,22 @@ import {
   Copy,
   Trash2,
   Wand2,
+  Loader2,
 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
-const mockProjects = [
-  {
-    id: "1",
-    name: "Critical VPN Vulnerability Advisory",
-    source: "incident.pdf",
-    outputs: 4,
-    formats: ["Video", "LinkedIn", "Advisory", "Exec Summary"],
-    created: "Today, 2:30 PM",
-    status: "completed" as const,
-  },
-  {
-    id: "2",
-    name: "Q3 Security Policy Update",
-    source: "policy.docx",
-    outputs: 3,
-    formats: ["Executive Summary", "Advisory", "LinkedIn"],
-    created: "Yesterday, 10:15 AM",
-    status: "completed" as const,
-  },
-  {
-    id: "3",
-    name: "Global Incident Response Report",
-    source: "text",
-    outputs: 4,
-    formats: ["LinkedIn", "Thread", "Summary", "Slides"],
-    created: "Aug 20, 3:45 PM",
-    status: "completed" as const,
-  },
-  {
-    id: "4",
-    name: "Cloud Migration Research Paper",
-    source: "research.pdf",
-    outputs: 3,
-    formats: ["Executive Summary", "Presentation", "Infographic"],
-    created: "Aug 18, 11:00 AM",
-    status: "completed" as const,
-  },
-  {
-    id: "5",
-    name: "Workplace Safety Announcement",
-    source: "text",
-    outputs: 2,
-    formats: ["Advisory", "LinkedIn"],
-    created: "Aug 15, 9:30 AM",
-    status: "completed" as const,
-  },
-];
+interface ProjectData {
+  id: string;
+  name: string;
+  status: string;
+  created_at: string;
+  sources: { topic?: string }[];
+  transformations: {
+    outputs: { format: string }[];
+  }[];
+}
 
-const statusColors = {
+const statusColors: Record<string, string> = {
   completed: "bg-emerald-50 text-emerald-600 border-emerald-200",
   processing: "bg-amber-50 text-amber-600 border-amber-200",
   draft: "bg-gray-100 text-gray-500 border-gray-200",
@@ -68,12 +33,62 @@ const statusColors = {
 export default function ProjectsPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [projects, setProjects] = useState<ProjectData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filtered = mockProjects.filter((p) => {
-    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === "all" || p.status === filter;
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session) {
+          setIsLoading(false);
+          return;
+        }
+
+        const res = await fetch("/api/projects");
+        if (!res.ok) {
+          setIsLoading(false);
+          return;
+        }
+
+        const { projects: fetchedProjects } = await res.json();
+        if (fetchedProjects) {
+          setProjects(fetchedProjects);
+        }
+      } catch {
+        // Use empty state
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchProjects();
+  }, []);
+
+  const filtered = projects.filter((p) => {
+    const matchesSearch = p.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchesFilter =
+      filter === "all" || p.status === filter;
     return matchesSearch && matchesFilter;
   });
+
+  if (isLoading) {
+    return (
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-6xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
+        </div>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-6xl mx-auto">
@@ -124,70 +139,89 @@ export default function ProjectsPage() {
 
       {/* Projects Grid */}
       <div className="grid gap-4">
-        {filtered.map((project) => (
-          <div
-            key={project.id}
-            className="bg-white rounded-xl p-5 border border-gray-200 hover:border-blue-200 hover:shadow-md hover:shadow-blue-500/5 transition-all group"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-4 flex-1 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
-                  <FolderOpen className="w-5 h-5 text-blue-500" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-gray-900 truncate">
-                    {project.name}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className="text-[10px] text-gray-400">
-                      Source: {project.source}
-                    </span>
-                    <span className="text-gray-300">·</span>
-                    <span className="text-[10px] text-gray-400">
-                      {project.created}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                    {project.formats.map((fmt) => (
-                      <span
-                        key={fmt}
-                        className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
-                      >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
+        {filtered.map((project) => {
+          const outputCount = project.transformations?.reduce(
+            (acc: number, t) => acc + (t.outputs?.length || 0),
+            0
+          ) || 0;
 
-              <div className="flex items-center gap-3 shrink-0">
-                <span
-                  className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
-                    statusColors[project.status]
-                  }`}
-                >
-                  {project.status}
-                </span>
-                <div className="flex items-center gap-1">
-                  <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
-                    <Copy className="w-3.5 h-3.5" />
-                  </button>
-                  <button className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+          const formats = [
+            ...new Set(
+              project.transformations?.flatMap((t) =>
+                t.outputs?.map((o) => o.format) || []
+              ) || []
+            ),
+          ];
+
+          return (
+            <div
+              key={project.id}
+              className="bg-white rounded-xl p-5 border border-gray-200 hover:border-blue-200 hover:shadow-md hover:shadow-blue-500/5 transition-all group"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-4 flex-1 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+                    <FolderOpen className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-gray-900 truncate">
+                      {project.name}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <span className="text-[10px] text-gray-400">
+                        {outputCount} outputs
+                      </span>
+                      <span className="text-gray-300">·</span>
+                      <span className="text-[10px] text-gray-400">
+                        {new Date(project.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                      {formats.slice(0, 5).map((fmt) => (
+                        <span
+                          key={fmt}
+                          className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  <span
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
+                      statusColors[project.status] || statusColors.draft
+                    }`}
+                  >
+                    {project.status}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                    <button className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {filtered.length === 0 && (
         <div className="text-center py-16">
           <FolderOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-gray-900 mb-2">No projects found</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
+            No projects found
+          </h3>
           <p className="text-sm text-gray-500 mb-4">
-            {search ? "Try a different search term." : "Start your first transformation."}
+            {search
+              ? "Try a different search term."
+              : "Start your first transformation."}
           </p>
           <Link
             href="/app/transform"

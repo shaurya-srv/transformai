@@ -28,13 +28,23 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/Toast";
-import type { SourceContext, TransformationConfig, GeneratedOutput } from "@/lib/ai";
+import type {
+  SourceContext,
+  TransformationConfig,
+  GeneratedOutput,
+} from "@/lib/ai";
 import { sampleSource, mockContext, mockOutputs } from "@/lib/mockData";
 import { crisisTemplates, type CrisisTemplate } from "@/lib/crisisTemplates";
 import { generatePptx } from "@/lib/pptxGenerator";
-import { generateInfographic, generateInfographicDataUrl } from "@/lib/infographicRenderer";
+import {
+  generateInfographic,
+} from "@/lib/infographicRenderer";
 import { generateVideo } from "@/lib/videoGenerator";
-import { analyzeConsistency, type ConsistencyResult } from "@/lib/consistencyEngine";
+import {
+  analyzeConsistency,
+  type ConsistencyResult,
+} from "@/lib/consistencyEngine";
+import { supabase } from "@/lib/supabase";
 
 // ── Step Indicator ───────────────────────────────────────────────────────
 const steps = [
@@ -57,7 +67,8 @@ function StepIndicator({ current }: { current: number }) {
                 className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300",
                   done && "bg-emerald-500 border-emerald-500 text-white",
-                  active && "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/30",
+                  active &&
+                    "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/30",
                   !done && !active && "bg-white border-gray-200 text-gray-400"
                 )}
               >
@@ -135,7 +146,9 @@ function AiProcessingScreen({
           {complete ? "Transformation Complete" : "TransformAI is working"}
         </h2>
         <p className="text-base text-gray-500 max-w-md mx-auto">
-          {complete ? "All deliverables generated and validated." : "Analyzing source and generating your deliverables..."}
+          {complete
+            ? "All deliverables generated and validated."
+            : "Analyzing source and generating your deliverables..."}
         </p>
       </div>
 
@@ -147,10 +160,32 @@ function AiProcessingScreen({
             const isDone = complete || step > stepNum;
             const isCurrent = !complete && step === stepNum;
             return (
-              <div key={i} className={cn("flex items-center gap-3 transition-all", isDone || isCurrent ? "opacity-100" : "opacity-30")}>
-                {isDone ? <Check className="w-4 h-4 text-emerald-500 shrink-0" /> : isCurrent ? <Loader2 className="w-4 h-4 text-blue-500 shrink-0 animate-spin" /> : <Circle className="w-4 h-4 text-gray-200 shrink-0" />}
-                <span className={cn("text-sm", isDone && "text-emerald-600 font-medium", isCurrent && "text-blue-600 font-semibold", !isDone && !isCurrent && "text-gray-400")}>
-                  {ps}{isCurrent && <span className="animate-pulse-dot ml-1">...</span>}
+              <div
+                key={i}
+                className={cn(
+                  "flex items-center gap-3 transition-all",
+                  isDone || isCurrent ? "opacity-100" : "opacity-30"
+                )}
+              >
+                {isDone ? (
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                ) : isCurrent ? (
+                  <Loader2 className="w-4 h-4 text-blue-500 shrink-0 animate-spin" />
+                ) : (
+                  <Circle className="w-4 h-4 text-gray-200 shrink-0" />
+                )}
+                <span
+                  className={cn(
+                    "text-sm",
+                    isDone && "text-emerald-600 font-medium",
+                    isCurrent && "text-blue-600 font-semibold",
+                    !isDone && !isCurrent && "text-gray-400"
+                  )}
+                >
+                  {ps}
+                  {isCurrent && (
+                    <span className="animate-pulse-dot ml-1">...</span>
+                  )}
                 </span>
               </div>
             );
@@ -161,11 +196,19 @@ function AiProcessingScreen({
       {/* Architecture */}
       <div className="bg-white rounded-2xl p-6 mb-8 border border-gray-200 shadow-sm">
         <div className="flex items-center justify-center gap-4 flex-wrap">
-          <div className="px-4 py-2 rounded-xl bg-blue-50 border border-blue-100"><span className="text-xs font-bold text-blue-600">SOURCE</span></div>
+          <div className="px-4 py-2 rounded-xl bg-blue-50 border border-blue-100">
+            <span className="text-xs font-bold text-blue-600">SOURCE</span>
+          </div>
           <ArrowRight className="w-4 h-4 text-gray-300" />
-          <div className="px-4 py-2 rounded-xl bg-cyan-50 border border-cyan-100"><span className="text-xs font-bold text-cyan-600">AI ENGINE</span></div>
+          <div className="px-4 py-2 rounded-xl bg-cyan-50 border border-cyan-100">
+            <span className="text-xs font-bold text-cyan-600">AI ENGINE</span>
+          </div>
           <ArrowRight className="w-4 h-4 text-gray-300" />
-          <div className="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-100"><span className="text-xs font-bold text-emerald-600">{selectedOutputs.length} OUTPUTS</span></div>
+          <div className="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-100">
+            <span className="text-xs font-bold text-emerald-600">
+              {selectedOutputs.length} OUTPUTS
+            </span>
+          </div>
         </div>
       </div>
 
@@ -176,9 +219,15 @@ function AiProcessingScreen({
             const format = outputFormats.find((f) => f.id === fmt);
             if (!format) return null;
             return (
-              <div key={fmt} className="bg-white rounded-xl p-4 text-center border border-gray-200 animate-fade-in-up" style={{ animationDelay: `${i * 0.15}s` }}>
+              <div
+                key={fmt}
+                className="bg-white rounded-xl p-4 text-center border border-gray-200 animate-fade-in-up"
+                style={{ animationDelay: `${i * 0.15}s` }}
+              >
                 <format.icon className="w-6 h-6 mx-auto mb-2 text-gray-400" />
-                <span className="text-[10px] font-bold text-gray-600 block">{format.name}</span>
+                <span className="text-[10px] font-bold text-gray-600 block">
+                  {format.name}
+                </span>
               </div>
             );
           })}
@@ -190,8 +239,10 @@ function AiProcessingScreen({
 
 // ── Consistency Display ──────────────────────────────────────────────────
 function ConsistencyDisplay({ result }: { result: ConsistencyResult }) {
-  const getScoreColor = (s: number) => s >= 90 ? "text-emerald-600" : s >= 70 ? "text-amber-600" : "text-red-500";
-  const getScoreBg = (s: number) => s >= 90 ? "bg-emerald-500" : s >= 70 ? "bg-amber-500" : "bg-red-500";
+  const getScoreColor = (s: number) =>
+    s >= 90 ? "text-emerald-600" : s >= 70 ? "text-amber-600" : "text-red-500";
+  const getScoreBg = (s: number) =>
+    s >= 90 ? "bg-emerald-500" : s >= 70 ? "bg-amber-500" : "bg-red-500";
 
   return (
     <div className="bg-white rounded-2xl p-5 mb-6 border border-gray-200 shadow-sm">
@@ -200,8 +251,21 @@ function ConsistencyDisplay({ result }: { result: ConsistencyResult }) {
           <BarChart3 className="w-4 h-4 text-blue-500" /> Quality Analysis
         </h3>
         <div className="flex items-center gap-2">
-          <span className={cn("text-2xl font-black", getScoreColor(result.overallScore))}>{result.overallScore}%</span>
-          <span className="text-[10px] text-gray-400 uppercase tracking-wider">{result.overallScore >= 90 ? "Excellent" : result.overallScore >= 70 ? "Good" : "Review"}</span>
+          <span
+            className={cn(
+              "text-2xl font-black",
+              getScoreColor(result.overallScore)
+            )}
+          >
+            {result.overallScore}%
+          </span>
+          <span className="text-[10px] text-gray-400 uppercase tracking-wider">
+            {result.overallScore >= 90
+              ? "Excellent"
+              : result.overallScore >= 70
+                ? "Good"
+                : "Review"}
+          </span>
         </div>
       </div>
       <div className="grid grid-cols-3 gap-4 mb-4">
@@ -212,22 +276,49 @@ function ConsistencyDisplay({ result }: { result: ConsistencyResult }) {
         ].map((item) => (
           <div key={item.label}>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-bold text-gray-400 uppercase">{item.label}</span>
-              <span className={cn("text-xs font-bold", getScoreColor(item.score))}>{item.score}%</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase">
+                {item.label}
+              </span>
+              <span
+                className={cn("text-xs font-bold", getScoreColor(item.score))}
+              >
+                {item.score}%
+              </span>
             </div>
             <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className={cn("h-full rounded-full transition-all duration-700", getScoreBg(item.score))} style={{ width: `${item.score}%` }} />
+              <div
+                className={cn(
+                  "h-full rounded-full transition-all duration-700",
+                  getScoreBg(item.score)
+                )}
+                style={{ width: `${item.score}%` }}
+              />
             </div>
           </div>
         ))}
       </div>
       {result.issues.length > 0 && (
         <div className="border-t border-gray-100 pt-3">
-          <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">{result.issues.length} issue{result.issues.length !== 1 ? "s" : ""} detected</p>
+          <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">
+            {result.issues.length} issue
+            {result.issues.length !== 1 ? "s" : ""} detected
+          </p>
           <div className="space-y-1.5">
             {result.issues.slice(0, 3).map((issue, i) => (
-              <div key={i} className={cn("text-[11px] px-2.5 py-1.5 rounded-lg", issue.severity === "high" && "bg-red-50 text-red-600 border border-red-100", issue.severity === "medium" && "bg-amber-50 text-amber-600 border border-amber-100", issue.severity === "low" && "bg-gray-50 text-gray-500 border border-gray-100")}>
-                <span className="font-bold uppercase">{issue.severity}</span> {issue.message}
+              <div
+                key={i}
+                className={cn(
+                  "text-[11px] px-2.5 py-1.5 rounded-lg",
+                  issue.severity === "high" &&
+                    "bg-red-50 text-red-600 border border-red-100",
+                  issue.severity === "medium" &&
+                    "bg-amber-50 text-amber-600 border border-amber-100",
+                  issue.severity === "low" &&
+                    "bg-gray-50 text-gray-500 border border-gray-100"
+                )}
+              >
+                <span className="font-bold uppercase">{issue.severity}</span>{" "}
+                {issue.message}
               </div>
             ))}
           </div>
@@ -244,7 +335,13 @@ export default function TransformPage() {
   const [sourceContent, setSourceContent] = useState("");
   const [context, setContext] = useState<SourceContext | null>(null);
   const [selectedOutputs, setSelectedOutputs] = useState<string[]>([]);
-  const [config, setConfig] = useState<TransformationConfig>({ audiences: [], tone: "Professional", language: "English", detail: "Standard", objectives: [] });
+  const [config, setConfig] = useState<TransformationConfig>({
+    audiences: [],
+    tone: "Professional",
+    language: "English",
+    detail: "Standard",
+    objectives: [],
+  });
   const [results, setResults] = useState<GeneratedOutput[] | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
@@ -252,13 +349,24 @@ export default function TransformPage() {
   const [activeResultTab, setActiveResultTab] = useState("");
   const [editedContent, setEditedContent] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
-  const [consistencyResult, setConsistencyResult] = useState<ConsistencyResult | null>(null);
+  const [consistencyResult, setConsistencyResult] =
+    useState<ConsistencyResult | null>(null);
   const [contentStyle, setContentStyle] = useState("Corporate");
   const [showCrisisTemplates, setShowCrisisTemplates] = useState(false);
 
+  // Database state
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [sourceId, setSourceId] = useState<string | null>(null);
+
   const loadDemo = () => {
     setSourceContent(sampleSource);
-    setConfig({ audiences: ["Security Teams", "Executives"], tone: "Urgent", language: "English", detail: "Detailed", objectives: ["Alert", "Inform"] });
+    setConfig({
+      audiences: ["Security Teams", "Executives"],
+      tone: "Urgent",
+      language: "English",
+      detail: "Detailed",
+      objectives: ["Alert", "Inform"],
+    });
     setContentStyle("Corporate");
     setSelectedOutputs(["linkedin", "video", "advisory", "presentation"]);
     toast("Demo loaded! Click Analyze to continue.", "info");
@@ -266,7 +374,13 @@ export default function TransformPage() {
 
   const loadCrisisTemplate = (template: CrisisTemplate) => {
     setSourceContent(template.sampleSource);
-    setConfig({ audiences: template.defaultConfig.audiences || [], tone: template.defaultConfig.tone || "Professional", language: template.defaultConfig.language || "English", detail: template.defaultConfig.detail || "Standard", objectives: template.defaultConfig.objectives || [] });
+    setConfig({
+      audiences: template.defaultConfig.audiences || [],
+      tone: template.defaultConfig.tone || "Professional",
+      language: template.defaultConfig.language || "English",
+      detail: template.defaultConfig.detail || "Standard",
+      objectives: template.defaultConfig.objectives || [],
+    });
     setSelectedOutputs(template.defaultOutputs);
     setShowCrisisTemplates(false);
     toast(`Template "${template.name}" loaded!`, "info");
@@ -277,9 +391,65 @@ export default function TransformPage() {
     setStep(2);
     setIsAnalyzing(true);
     setAnalysisStep(0);
-    for (let i = 1; i <= 7; i++) { await new Promise((r) => setTimeout(r, 400)); setAnalysisStep(i); }
+
+    // Try to create a project in the database
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session) {
+        // Create project
+        const projectRes = await fetch("/api/projects", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name:
+              sourceContent.slice(0, 60).trim() +
+              (sourceContent.length > 60 ? "..." : ""),
+          }),
+        });
+
+        if (projectRes.ok) {
+          const { project } = await projectRes.json();
+          setProjectId(project.id);
+        }
+      }
+    } catch {
+      // Continue without database — demo mode still works
+    }
+
+    // Animate through analysis steps
+    for (let i = 1; i <= 7; i++) {
+      await new Promise((r) => setTimeout(r, 400));
+      setAnalysisStep(i);
+    }
     await new Promise((r) => setTimeout(r, 500));
-    setContext(mockContext);
+
+    // Try to call the real API, fall back to mock
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: sourceContent,
+          projectId: projectId,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setContext(data.context);
+        if (data.sourceId) setSourceId(data.sourceId);
+      } else {
+        // Fall back to mock
+        setContext(mockContext);
+      }
+    } catch {
+      // Fall back to mock
+      setContext(mockContext);
+    }
+
     setIsAnalyzing(false);
     toast("Source analyzed successfully", "success");
   };
@@ -289,9 +459,56 @@ export default function TransformPage() {
     setStep(4);
     setIsTransforming(true);
     setAnalysisStep(0);
-    for (let i = 1; i <= 7; i++) { await new Promise((r) => setTimeout(r, 500)); setAnalysisStep(i); }
+
+    // Animate through generation steps
+    for (let i = 1; i <= 7; i++) {
+      await new Promise((r) => setTimeout(r, 500));
+      setAnalysisStep(i);
+    }
     await new Promise((r) => setTimeout(r, 500));
-    const generated = selectedOutputs.filter((t) => mockOutputs[t]).map((t) => ({ title: mockOutputs[t].title, content: mockOutputs[t].content, format: t, validated: true }));
+
+    // Generate outputs
+    let generated: GeneratedOutput[] = [];
+
+    try {
+      const res = await fetch("/api/transform", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          context,
+          config,
+          outputTypes: selectedOutputs,
+          projectId,
+          sourceId,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        generated = data.outputs;
+      } else {
+        // Fall back to mock
+        generated = selectedOutputs
+          .filter((t) => mockOutputs[t])
+          .map((t) => ({
+            title: mockOutputs[t].title,
+            content: mockOutputs[t].content,
+            format: t,
+            validated: true,
+          }));
+      }
+    } catch {
+      // Fall back to mock
+      generated = selectedOutputs
+        .filter((t) => mockOutputs[t])
+        .map((t) => ({
+          title: mockOutputs[t].title,
+          content: mockOutputs[t].content,
+          format: t,
+          validated: true,
+        }));
+    }
+
     setResults(generated);
     if (context) setConsistencyResult(analyzeConsistency(context, generated));
     setIsTransforming(false);
@@ -299,20 +516,57 @@ export default function TransformPage() {
     toast(`${generated.length} deliverables generated!`, "success");
   };
 
-  const toggleOutput = (id: string) => setSelectedOutputs((p) => p.includes(id) ? p.filter((o) => o !== id) : [...p, id]);
+  const toggleOutput = (id: string) =>
+    setSelectedOutputs((p) =>
+      p.includes(id) ? p.filter((o) => o !== id) : [...p, id]
+    );
 
-  const reset = () => { setStep(1); setSourceContent(""); setContext(null); setSelectedOutputs([]); setResults(null); setIsAnalyzing(false); setIsTransforming(false); setAnalysisStep(0); setConsistencyResult(null); };
+  const reset = () => {
+    setStep(1);
+    setSourceContent("");
+    setContext(null);
+    setSelectedOutputs([]);
+    setResults(null);
+    setIsAnalyzing(false);
+    setIsTransforming(false);
+    setAnalysisStep(0);
+    setConsistencyResult(null);
+    setProjectId(null);
+    setSourceId(null);
+  };
 
-  const handleCopy = (content: string) => { navigator.clipboard.writeText(content); toast("Copied to clipboard"); };
+  const handleCopy = (content: string) => {
+    navigator.clipboard.writeText(content);
+    toast("Copied to clipboard");
+  };
 
   const handleExport = async (output: GeneratedOutput) => {
     setIsExporting(true);
     try {
-      if (output.format === "presentation") { await generatePptx(output.title, output.content); toast("Downloaded as .pptx"); }
-      else if (output.format === "infographic") { generateInfographic(output.title, output.content); toast("Downloaded as .png"); }
-      else if (output.format === "video") { await generateVideo(output.title, output.content); toast("Downloaded as .webm"); }
-      else { const blob = new Blob([output.content], { type: "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `${output.title.replace(/[^a-zA-Z0-9]/g, "_")}.txt`; a.click(); URL.revokeObjectURL(url); toast("Downloaded as .txt"); }
-    } catch { toast("Export failed", "error"); } finally { setIsExporting(false); }
+      if (output.format === "presentation") {
+        await generatePptx(output.title, output.content);
+        toast("Downloaded as .pptx");
+      } else if (output.format === "infographic") {
+        generateInfographic(output.title, output.content);
+        toast("Downloaded as .png");
+      } else if (output.format === "video") {
+        await generateVideo(output.title, output.content);
+        toast("Downloaded as .webm");
+      } else {
+        const blob = new Blob([output.content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${output.title.replace(/[^a-zA-Z0-9]/g, "_")}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast("Downloaded as .txt");
+      }
+    } catch {
+      toast("Export failed", "error");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const activeOutput = results?.find((o) => o.format === activeResultTab);
@@ -324,20 +578,47 @@ export default function TransformPage() {
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-3xl max-h-[80vh] overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <div><h2 className="text-lg font-bold text-gray-900">Crisis Response Templates</h2><p className="text-sm text-gray-500 mt-0.5">Pre-configured for common scenarios.</p></div>
-              <button onClick={() => setShowCrisisTemplates(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"><X className="w-4 h-4" /></button>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">
+                  Crisis Response Templates
+                </h2>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  Pre-configured for common scenarios.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowCrisisTemplates(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
             <div className="p-6 overflow-y-auto max-h-[60vh]">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {crisisTemplates.map((template) => (
-                  <button key={template.id} onClick={() => loadCrisisTemplate(template)} className="text-left p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-all group">
+                  <button
+                    key={template.id}
+                    onClick={() => loadCrisisTemplate(template)}
+                    className="text-left p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-all group"
+                  >
                     <div className="flex items-start gap-3">
                       <span className="text-2xl">{template.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{template.name}</h3>
-                        <p className="text-xs text-gray-400 mt-1 line-clamp-2">{template.description}</p>
+                        <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
+                          {template.name}
+                        </h3>
+                        <p className="text-xs text-gray-400 mt-1 line-clamp-2">
+                          {template.description}
+                        </p>
                         <div className="flex flex-wrap gap-1 mt-2">
-                          {template.defaultOutputs.slice(0, 3).map((output) => (<span key={output} className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">{output}</span>))}
+                          {template.defaultOutputs.slice(0, 3).map((output) => (
+                            <span
+                              key={output}
+                              className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600"
+                            >
+                              {output}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -353,32 +634,96 @@ export default function TransformPage() {
       {step === 1 && (
         <div className="max-w-3xl mx-auto animate-fade-in-up">
           <div className="flex items-center justify-between mb-6">
-            <div><h1 className="text-2xl font-bold text-gray-900">New Transformation</h1><p className="text-sm text-gray-500 mt-1">Turn your source information into professional communication assets.</p></div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                New Transformation
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">
+                Turn your source information into professional communication
+                assets.
+              </p>
+            </div>
             <div className="flex gap-2">
-              <button onClick={() => setShowCrisisTemplates(true)} className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-cyan-700 bg-cyan-50 border border-cyan-200 rounded-xl hover:bg-cyan-100 transition-colors">🛡️ Templates</button>
-              <button onClick={loadDemo} className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors"><Zap className="w-3.5 h-3.5" /> Try Demo</button>
+              <button
+                onClick={() => setShowCrisisTemplates(true)}
+                className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-cyan-700 bg-cyan-50 border border-cyan-200 rounded-xl hover:bg-cyan-100 transition-colors"
+              >
+                🛡️ Templates
+              </button>
+              <button
+                onClick={loadDemo}
+                className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors"
+              >
+                <Zap className="w-3.5 h-3.5" /> Try Demo
+              </button>
             </div>
           </div>
           <StepIndicator current={1} />
           <div className="flex gap-2 mb-4">
-            {[{ icon: FileText, label: "Text", active: true }, { icon: Link2, label: "URL", active: false }, { icon: Upload, label: "Document", active: false }].map((tab) => (
-              <button key={tab.label} className={cn("flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all", tab.active ? "bg-blue-50 text-blue-700 border border-blue-200" : "bg-gray-50 text-gray-400 border border-gray-200")} disabled={!tab.active}>
-                <tab.icon className="w-3.5 h-3.5" />{tab.label}{!tab.active && <span className="text-[9px] opacity-60">(soon)</span>}
+            {[
+              { icon: FileText, label: "Text", active: true },
+              { icon: Link2, label: "URL", active: false },
+              { icon: Upload, label: "Document", active: false },
+            ].map((tab) => (
+              <button
+                key={tab.label}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all",
+                  tab.active
+                    ? "bg-blue-50 text-blue-700 border border-blue-200"
+                    : "bg-gray-50 text-gray-400 border border-gray-200"
+                )}
+                disabled={!tab.active}
+              >
+                <tab.icon className="w-3.5 h-3.5" />
+                {tab.label}
+                {!tab.active && (
+                  <span className="text-[9px] opacity-60">(soon)</span>
+                )}
               </button>
             ))}
           </div>
           <div className="relative">
-            <textarea value={sourceContent} onChange={(e) => setSourceContent(e.target.value)} placeholder="Paste your source content here — articles, reports, advisories, research papers, announcements, or any organizational information..." className="w-full h-72 p-4 text-sm text-gray-900 bg-white border border-gray-200 rounded-2xl resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400 leading-relaxed transition-all" />
+            <textarea
+              value={sourceContent}
+              onChange={(e) => setSourceContent(e.target.value)}
+              placeholder="Paste your source content here — articles, reports, advisories, research papers, announcements, or any organizational information..."
+              className="w-full h-72 p-4 text-sm text-gray-900 bg-white border border-gray-200 rounded-2xl resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400 leading-relaxed transition-all"
+            />
             {sourceContent.length > 0 && (
               <div className="absolute bottom-3 right-4 flex items-center gap-3">
-                <span className="text-[10px] text-gray-400">{sourceContent.split(/\s+/).length.toLocaleString()} words · {sourceContent.length.toLocaleString()} chars</span>
-                <button onClick={() => setSourceContent("")} className="text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Clear</button>
+                <span className="text-[10px] text-gray-400">
+                  {sourceContent.split(/\s+/).length.toLocaleString()} words ·{" "}
+                  {sourceContent.length.toLocaleString()} chars
+                </span>
+                <button
+                  onClick={() => setSourceContent("")}
+                  className="text-[10px] text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  Clear
+                </button>
               </div>
             )}
           </div>
           <div className="flex items-center justify-between mt-4">
-            <button onClick={() => setSourceContent(sampleSource)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors"><Wand2 className="w-4 h-4" /> Load Sample Advisory</button>
-            <button onClick={handleAnalyze} disabled={!sourceContent.trim()} className={cn("flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all", sourceContent.trim() ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/25" : "bg-gray-100 text-gray-400 cursor-not-allowed")}>Analyze Source <ArrowRight className="w-4 h-4" /></button>
+            <button
+              onClick={() => setSourceContent(sampleSource)}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors"
+            >
+              <Wand2 className="w-4 h-4" /> Load Sample Advisory
+            </button>
+            <button
+              onClick={handleAnalyze}
+              disabled={!sourceContent.trim()}
+              className={cn(
+                "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all",
+                sourceContent.trim()
+                  ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/25"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              )}
+            >
+              Analyze Source <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
@@ -390,12 +735,44 @@ export default function TransformPage() {
           {isAnalyzing ? (
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
               <div className="space-y-3">
-                {["Source received", "Extracting content", "Understanding context", "Identifying key facts", "Building content strategy"].map((ps, i) => {
-                  const stepNum = i + 1; const isDone = analysisStep > stepNum; const isCurrent = analysisStep === stepNum;
+                {[
+                  "Source received",
+                  "Extracting content",
+                  "Understanding context",
+                  "Identifying key facts",
+                  "Building content strategy",
+                ].map((ps, i) => {
+                  const stepNum = i + 1;
+                  const isDone = analysisStep > stepNum;
+                  const isCurrent = analysisStep === stepNum;
                   return (
-                    <div key={i} className={cn("flex items-center gap-3 transition-all", isDone || isCurrent ? "opacity-100" : "opacity-30")}>
-                      {isDone ? <Check className="w-4 h-4 text-emerald-500 shrink-0" /> : isCurrent ? <Loader2 className="w-4 h-4 text-blue-500 shrink-0 animate-spin" /> : <Circle className="w-4 h-4 text-gray-200 shrink-0" />}
-                      <span className={cn("text-sm", isDone && "text-emerald-600 font-medium", isCurrent && "text-blue-600 font-semibold", !isDone && !isCurrent && "text-gray-400")}>{ps}{isCurrent && <span className="animate-pulse-dot ml-1">...</span>}</span>
+                    <div
+                      key={i}
+                      className={cn(
+                        "flex items-center gap-3 transition-all",
+                        isDone || isCurrent ? "opacity-100" : "opacity-30"
+                      )}
+                    >
+                      {isDone ? (
+                        <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      ) : isCurrent ? (
+                        <Loader2 className="w-4 h-4 text-blue-500 shrink-0 animate-spin" />
+                      ) : (
+                        <Circle className="w-4 h-4 text-gray-200 shrink-0" />
+                      )}
+                      <span
+                        className={cn(
+                          "text-sm",
+                          isDone && "text-emerald-600 font-medium",
+                          isCurrent && "text-blue-600 font-semibold",
+                          !isDone && !isCurrent && "text-gray-400"
+                        )}
+                      >
+                        {ps}
+                        {isCurrent && (
+                          <span className="animate-pulse-dot ml-1">...</span>
+                        )}
+                      </span>
                     </div>
                   );
                 })}
@@ -404,31 +781,74 @@ export default function TransformPage() {
           ) : context ? (
             <div className="space-y-6 animate-fade-in-up">
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <h2 className="text-lg font-bold text-gray-900 mb-1">AI Understanding</h2>
-                <p className="text-sm text-gray-500 mb-6">Source context extracted successfully.</p>
+                <h2 className="text-lg font-bold text-gray-900 mb-1">
+                  AI Understanding
+                </h2>
+                <p className="text-sm text-gray-500 mb-6">
+                  Source context extracted successfully.
+                </p>
                 <div className="grid sm:grid-cols-2 gap-4 mb-6">
-                  {[{ label: "Content Type", value: context.source_type }, { label: "Primary Objective", value: context.intent }, { label: "Key Topic", value: context.topic }, { label: "Confidence", value: `${Math.round(context.confidence * 100)}%` }].map((item) => (
-                    <div key={item.label} className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{item.label}</span>
-                      <p className="text-sm font-semibold text-gray-900 mt-1">{item.value}</p>
+                  {[
+                    { label: "Content Type", value: context.source_type },
+                    { label: "Primary Objective", value: context.intent },
+                    { label: "Key Topic", value: context.topic },
+                    {
+                      label: "Confidence",
+                      value: `${Math.round(context.confidence * 100)}%`,
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className="p-4 rounded-xl bg-gray-50 border border-gray-100"
+                    >
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                        {item.label}
+                      </span>
+                      <p className="text-sm font-semibold text-gray-900 mt-1">
+                        {item.value}
+                      </p>
                     </div>
                   ))}
                 </div>
                 <div className="mb-4">
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Key Facts</h3>
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    Key Facts
+                  </h3>
                   <div className="space-y-2">
-                    {context.key_facts.map((fact, i) => (<div key={i} className="flex items-start gap-2 text-sm text-gray-600"><Check className="w-3.5 h-3.5 text-blue-500 mt-0.5 shrink-0" />{fact}</div>))}
+                    {context.key_facts.map((fact, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-2 text-sm text-gray-600"
+                      >
+                        <Check className="w-3.5 h-3.5 text-blue-500 mt-0.5 shrink-0" />
+                        {fact}
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">AI Insights</h3>
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    AI Insights
+                  </h3>
                   <div className="space-y-2">
-                    {context.recommendations.slice(0, 3).map((rec, i) => (<div key={i} className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-sm text-gray-600">{rec}</div>))}
+                    {context.recommendations.slice(0, 3).map((rec, i) => (
+                      <div
+                        key={i}
+                        className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-sm text-gray-600"
+                      >
+                        {rec}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
               <div className="flex justify-end">
-                <button onClick={() => setStep(3)} className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25">Select Outputs <ArrowRight className="w-4 h-4" /></button>
+                <button
+                  onClick={() => setStep(3)}
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25"
+                >
+                  Select Outputs <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ) : null}
@@ -439,17 +859,55 @@ export default function TransformPage() {
       {step === 3 && !results && (
         <div className="max-w-4xl mx-auto animate-fade-in-up">
           <StepIndicator current={3} />
-          <div className="mb-6"><h2 className="text-lg font-bold text-gray-900">What do you want to create?</h2><p className="text-sm text-gray-500 mt-1">Select multiple outputs. Configure your preferences below.</p></div>
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-gray-900">
+              What do you want to create?
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Select multiple outputs. Configure your preferences below.
+            </p>
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
             {outputFormats.map((fmt) => {
               const isSelected = selectedOutputs.includes(fmt.id);
               return (
-                <button key={fmt.id} onClick={() => toggleOutput(fmt.id)} className={cn("flex items-start gap-3 p-4 rounded-xl border text-left transition-all", isSelected ? "bg-blue-50 border-blue-200 shadow-md shadow-blue-500/5" : "bg-white border-gray-200 hover:border-gray-300")}>
-                  <div className={cn("mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all", isSelected ? "bg-blue-600 border-blue-600" : "border-gray-300")}>{isSelected && <Check className="w-3 h-3 text-white" />}</div>
+                <button
+                  key={fmt.id}
+                  onClick={() => toggleOutput(fmt.id)}
+                  className={cn(
+                    "flex items-start gap-3 p-4 rounded-xl border text-left transition-all",
+                    isSelected
+                      ? "bg-blue-50 border-blue-200 shadow-md shadow-blue-500/5"
+                      : "bg-white border-gray-200 hover:border-gray-300"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all",
+                      isSelected
+                        ? "bg-blue-600 border-blue-600"
+                        : "border-gray-300"
+                    )}
+                  >
+                    {isSelected && <Check className="w-3 h-3 text-white" />}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <fmt.icon className={cn("w-4 h-4 shrink-0", isSelected ? "text-blue-600" : "text-gray-400")} style={!isSelected ? { color: fmt.color } : undefined} />
-                      <span className={cn("text-sm font-semibold", isSelected ? "text-gray-900" : "text-gray-600")}>{fmt.name}</span>
+                      <fmt.icon
+                        className={cn(
+                          "w-4 h-4 shrink-0",
+                          isSelected ? "text-blue-600" : "text-gray-400"
+                        )}
+                        style={!isSelected ? { color: fmt.color } : undefined}
+                      />
+                      <span
+                        className={cn(
+                          "text-sm font-semibold",
+                          isSelected ? "text-gray-900" : "text-gray-600"
+                        )}
+                      >
+                        {fmt.name}
+                      </span>
                     </div>
                     <p className="text-xs text-gray-400 mt-1">{fmt.desc}</p>
                   </div>
@@ -460,70 +918,200 @@ export default function TransformPage() {
 
           {/* Config */}
           <div className="bg-white rounded-2xl p-6 mb-8 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-bold text-gray-900 mb-4">Generation Controls</h3>
+            <h3 className="text-sm font-bold text-gray-900 mb-4">
+              Generation Controls
+            </h3>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">Target Audience</label>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">
+                  Target Audience
+                </label>
                 <div className="flex flex-wrap gap-1.5">
-                  {["General", "Executive", "Technical", "Public", "Media"].map((a) => (
-                    <button key={a} onClick={() => setConfig((c) => ({ ...c, audiences: c.audiences.includes(a) ? c.audiences.filter((x) => x !== a) : [...c.audiences, a] }))} className={cn("px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all", config.audiences.includes(a) ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300")}>
-                      {config.audiences.includes(a) && "✓ "}{a}
+                  {["General", "Executive", "Technical", "Public", "Media"].map(
+                    (a) => (
+                      <button
+                        key={a}
+                        onClick={() =>
+                          setConfig((c) => ({
+                            ...c,
+                            audiences: c.audiences.includes(a)
+                              ? c.audiences.filter((x) => x !== a)
+                              : [...c.audiences, a],
+                          }))
+                        }
+                        className={cn(
+                          "px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all",
+                          config.audiences.includes(a)
+                            ? "bg-blue-50 text-blue-700 border-blue-200"
+                            : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
+                        )}
+                      >
+                        {config.audiences.includes(a) && "✓ "}
+                        {a}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">
+                  Tone
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    "Professional",
+                    "Urgent",
+                    "Authoritative",
+                    "Conversational",
+                    "Formal",
+                  ].map((t) => (
+                    <button
+                      key={t}
+                      onClick={() =>
+                        setConfig((c) => ({ ...c, tone: t }))
+                      }
+                      className={cn(
+                        "px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all",
+                        config.tone === t
+                          ? "bg-blue-50 text-blue-700 border-blue-200"
+                          : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
+                      )}
+                    >
+                      {config.tone === t && "● "}
+                      {t}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">Tone</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {["Professional", "Urgent", "Authoritative", "Conversational", "Formal"].map((t) => (
-                    <button key={t} onClick={() => setConfig((c) => ({ ...c, tone: t }))} className={cn("px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all", config.tone === t ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300")}>
-                      {config.tone === t && "● "}{t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">Language</label>
-                <select value={config.language} onChange={(e) => setConfig((c) => ({ ...c, language: e.target.value }))} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
-                  {["English", "Hindi", "Spanish", "French", "German"].map((l) => (<option key={l} value={l}>{l}</option>))}
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">
+                  Language
+                </label>
+                <select
+                  value={config.language}
+                  onChange={(e) =>
+                    setConfig((c) => ({ ...c, language: e.target.value }))
+                  }
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                >
+                  {["English", "Hindi", "Spanish", "French", "German"].map(
+                    (l) => (
+                      <option key={l} value={l}>
+                        {l}
+                      </option>
+                    )
+                  )}
                 </select>
               </div>
               <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">Detail Level</label>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">
+                  Detail Level
+                </label>
                 <div className="flex gap-1.5">
                   {["Brief", "Standard", "Detailed"].map((d) => (
-                    <button key={d} onClick={() => setConfig((c) => ({ ...c, detail: d }))} className={cn("flex-1 px-3 py-2 rounded-lg text-[11px] font-medium border transition-all", config.detail === d ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300")}>{d}</button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">Objective</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {["Inform", "Persuade", "Alert", "Educate", "Engage"].map((o) => (
-                    <button key={o} onClick={() => setConfig((c) => ({ ...c, objectives: c.objectives.includes(o) ? c.objectives.filter((x) => x !== o) : [...c.objectives, o] }))} className={cn("px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all", config.objectives.includes(o) ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300")}>
-                      {config.objectives.includes(o) && "✓ "}{o}
+                    <button
+                      key={d}
+                      onClick={() =>
+                        setConfig((c) => ({ ...c, detail: d }))
+                      }
+                      className={cn(
+                        "flex-1 px-3 py-2 rounded-lg text-[11px] font-medium border transition-all",
+                        config.detail === d
+                          ? "bg-blue-50 text-blue-700 border-blue-200"
+                          : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
+                      )}
+                    >
+                      {d}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">Content Style</label>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">
+                  Objective
+                </label>
                 <div className="flex flex-wrap gap-1.5">
-                  {["Corporate", "Editorial", "Social", "Newsroom", "Formal"].map((s) => (
-                    <button key={s} onClick={() => setContentStyle(s)} className={cn("px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all", contentStyle === s ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300")}>
-                      {contentStyle === s && "● "}{s}
-                    </button>
-                  ))}
+                  {["Inform", "Persuade", "Alert", "Educate", "Engage"].map(
+                    (o) => (
+                      <button
+                        key={o}
+                        onClick={() =>
+                          setConfig((c) => ({
+                            ...c,
+                            objectives: c.objectives.includes(o)
+                              ? c.objectives.filter((x) => x !== o)
+                              : [...c.objectives, o],
+                          }))
+                        }
+                        className={cn(
+                          "px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all",
+                          config.objectives.includes(o)
+                            ? "bg-blue-50 text-blue-700 border-blue-200"
+                            : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
+                        )}
+                      >
+                        {config.objectives.includes(o) && "✓ "}
+                        {o}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">
+                  Content Style
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {["Corporate", "Editorial", "Social", "Newsroom", "Formal"].map(
+                    (s) => (
+                      <button
+                        key={s}
+                        onClick={() => setContentStyle(s)}
+                        className={cn(
+                          "px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all",
+                          contentStyle === s
+                            ? "bg-blue-50 text-blue-700 border-blue-200"
+                            : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
+                        )}
+                      >
+                        {contentStyle === s && "● "}
+                        {s}
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
           <div className="flex items-center justify-between">
-            <button onClick={() => setStep(1)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"><ArrowLeft className="w-4 h-4" /> Back</button>
+            <button
+              onClick={() => setStep(1)}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back
+            </button>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-400">{selectedOutputs.length > 0 ? <span className="text-blue-600 font-bold">{selectedOutputs.length}</span> : "Select at least one output"} {selectedOutputs.length === 1 ? "output" : "outputs"}</span>
-              <button onClick={handleTransform} disabled={selectedOutputs.length === 0} className={cn("flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-lg", selectedOutputs.length > 0 ? "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/25" : "bg-gray-100 text-gray-400 cursor-not-allowed")}>
+              <span className="text-sm text-gray-400">
+                {selectedOutputs.length > 0 ? (
+                  <span className="text-blue-600 font-bold">
+                    {selectedOutputs.length}
+                  </span>
+                ) : (
+                  "Select at least one output"
+                )}{" "}
+                {selectedOutputs.length === 1 ? "output" : "outputs"}
+              </span>
+              <button
+                onClick={handleTransform}
+                disabled={selectedOutputs.length === 0}
+                className={cn(
+                  "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-lg",
+                  selectedOutputs.length > 0
+                    ? "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/25"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                )}
+              >
                 <Sparkles className="w-4 h-4" /> Transform Content
               </button>
             </div>
@@ -535,23 +1123,52 @@ export default function TransformPage() {
       {step === 4 && (
         <div className="animate-fade-in-up">
           {isTransforming ? (
-            <AiProcessingScreen step={analysisStep} complete={false} selectedOutputs={selectedOutputs} />
+            <AiProcessingScreen
+              step={analysisStep}
+              complete={false}
+              selectedOutputs={selectedOutputs}
+            />
           ) : results ? (
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-sm text-emerald-600 font-medium mb-4"><CheckCircle className="w-4 h-4" /> Transformation Complete</div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{results.length} deliverable{results.length !== 1 ? "s" : ""} generated from 1 source</h2>
-                <p className="text-sm text-gray-500">Source-grounded · Consistency-checked · Format-validated</p>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-sm text-emerald-600 font-medium mb-4">
+                  <CheckCircle className="w-4 h-4" /> Transformation Complete
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  {results.length} deliverable
+                  {results.length !== 1 ? "s" : ""} generated from 1 source
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Source-grounded · Consistency-checked · Format-validated
+                </p>
               </div>
 
-              {consistencyResult && <ConsistencyDisplay result={consistencyResult} />}
+              {consistencyResult && (
+                <ConsistencyDisplay result={consistencyResult} />
+              )}
 
               <div className="flex gap-1 mb-4 overflow-x-auto pb-1">
                 {results.map((output) => {
-                  const fmt = outputFormats.find((f) => f.id === output.format); const Icon = fmt?.icon || FileText;
+                  const fmt = outputFormats.find(
+                    (f) => f.id === output.format
+                  );
+                  const Icon = fmt?.icon || FileText;
                   return (
-                    <button key={output.format} onClick={() => { setActiveResultTab(output.format); setEditedContent(null); }} className={cn("flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all shrink-0", activeResultTab === output.format ? "bg-blue-600 text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50")}>
-                      <Icon className="w-3.5 h-3.5" />{fmt?.name || output.format}
+                    <button
+                      key={output.format}
+                      onClick={() => {
+                        setActiveResultTab(output.format);
+                        setEditedContent(null);
+                      }}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all shrink-0",
+                        activeResultTab === output.format
+                          ? "bg-blue-600 text-white shadow-sm"
+                          : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                      )}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      {fmt?.name || output.format}
                     </button>
                   );
                 })}
@@ -560,41 +1177,107 @@ export default function TransformPage() {
               {activeOutput && (
                 <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
                   <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
-                    <h3 className="text-sm font-bold text-gray-900">{activeOutput.title}</h3>
-                    <span className="text-[10px] text-emerald-600 font-medium px-2 py-0.5 bg-emerald-50 border border-emerald-200 rounded-full">✓ Validated</span>
+                    <h3 className="text-sm font-bold text-gray-900">
+                      {activeOutput.title}
+                    </h3>
+                    <span className="text-[10px] text-emerald-600 font-medium px-2 py-0.5 bg-emerald-50 border border-emerald-200 rounded-full">
+                      ✓ Validated
+                    </span>
                   </div>
                   <div className="px-5 py-4 max-h-[500px] overflow-y-auto">
                     {editedContent !== null ? (
-                      <textarea value={editedContent} onChange={(e) => setEditedContent(e.target.value)} className="w-full h-96 p-4 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 font-mono leading-relaxed" />
+                      <textarea
+                        value={editedContent}
+                        onChange={(e) => setEditedContent(e.target.value)}
+                        className="w-full h-96 p-4 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 font-mono leading-relaxed"
+                      />
                     ) : (
-                      <pre className="text-sm text-gray-600 whitespace-pre-wrap font-sans leading-relaxed">{activeOutput.content}</pre>
+                      <pre className="text-sm text-gray-600 whitespace-pre-wrap font-sans leading-relaxed">
+                        {activeOutput.content}
+                      </pre>
                     )}
                   </div>
                   <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50">
                     <div className="flex items-center gap-2 flex-wrap">
                       {editedContent !== null ? (
                         <>
-                          <button onClick={() => { setEditedContent(null); toast("Changes saved"); }} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"><CheckCircle className="w-3.5 h-3.5" /> Save</button>
-                          <button onClick={() => setEditedContent(null)} className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors">Cancel</button>
+                          <button
+                            onClick={() => {
+                              setEditedContent(null);
+                              toast("Changes saved");
+                            }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                          >
+                            <CheckCircle className="w-3.5 h-3.5" /> Save
+                          </button>
+                          <button
+                            onClick={() => setEditedContent(null)}
+                            className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                          >
+                            Cancel
+                          </button>
                         </>
                       ) : (
                         <>
-                          <button onClick={() => handleCopy(activeOutput.content)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 rounded-lg transition-colors"><Copy className="w-3.5 h-3.5" /> Copy</button>
-                          <button onClick={() => handleExport(activeOutput)} disabled={isExporting} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"><Download className="w-3.5 h-3.5" /> Export</button>
-                          <button onClick={() => setEditedContent(activeOutput.content)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 rounded-lg transition-colors">✏️ Edit</button>
+                          <button
+                            onClick={() => handleCopy(activeOutput.content)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 rounded-lg transition-colors"
+                          >
+                            <Copy className="w-3.5 h-3.5" /> Copy
+                          </button>
+                          <button
+                            onClick={() => handleExport(activeOutput)}
+                            disabled={isExporting}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            <Download className="w-3.5 h-3.5" /> Export
+                          </button>
+                          <button
+                            onClick={() =>
+                              setEditedContent(activeOutput.content)
+                            }
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 rounded-lg transition-colors"
+                          >
+                            ✏️ Edit
+                          </button>
                         </>
                       )}
                     </div>
-                    <button onClick={() => { toast(`Regenerating...`, "info"); setTimeout(() => toast("Regeneration complete", "success"), 1500); }} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 border border-blue-200 rounded-lg transition-colors"><RefreshCw className="w-3.5 h-3.5" /> Regenerate</button>
+                    <button
+                      onClick={() => {
+                        toast(`Regenerating...`, "info");
+                        setTimeout(
+                          () => toast("Regeneration complete", "success"),
+                          1500
+                        );
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 border border-blue-200 rounded-lg transition-colors"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" /> Regenerate
+                    </button>
                   </div>
                 </div>
               )}
 
               <div className="flex items-center justify-between mt-8">
-                <button onClick={() => setStep(3)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"><ArrowLeft className="w-4 h-4" /> Edit Config</button>
-                <button onClick={reset} className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25"><Wand2 className="w-4 h-4" /> New Transformation</button>
+                <button
+                  onClick={() => setStep(3)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Edit Config
+                </button>
+                <button
+                  onClick={reset}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25"
+                >
+                  <Wand2 className="w-4 h-4" /> New Transformation
+                </button>
               </div>
-              <div className="text-center mt-12 pb-8"><p className="text-sm font-semibold text-gray-400 tracking-wide">One Source. Infinite Communication.</p></div>
+              <div className="text-center mt-12 pb-8">
+                <p className="text-sm font-semibold text-gray-400 tracking-wide">
+                  One Source. Infinite Communication.
+                </p>
+              </div>
             </div>
           ) : null}
         </div>

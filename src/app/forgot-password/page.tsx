@@ -41,9 +41,13 @@ export default function ForgotPasswordPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
               <Zap className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">TransformAI</span>
+            <span className="text-xl font-bold text-gray-900">
+              TransformAI
+            </span>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Reset your password</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Reset your password
+          </h1>
           <p className="text-sm text-gray-500">
             Enter your email and we&apos;ll send you a reset link.
           </p>
@@ -54,10 +58,13 @@ export default function ForgotPasswordPage() {
             <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-7 h-7 text-emerald-500" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-2">Check your email</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-2">
+              Check your email
+            </h2>
             <p className="text-sm text-gray-500 mb-6">
-              We&apos;ve sent a password reset link to <strong className="text-gray-900">{email}</strong>.
-              Check your inbox and follow the instructions.
+              We&apos;ve sent a password reset link to{" "}
+              <strong className="text-gray-900">{email}</strong>. Check your
+              inbox and follow the instructions.
             </p>
             <Link
               href="/login"

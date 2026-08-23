@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/lib/supabase";
 import { Zap, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
@@ -37,10 +38,9 @@ export default function LoginPage() {
     setError("");
     setIsLoading(true);
     const result = await loginWithGoogle();
-    setIsLoading(false);
-    if (result.success) {
-      router.push("/app");
-    } else {
+    // Google OAuth triggers a redirect — loading state stays
+    if (!result.success) {
+      setIsLoading(false);
       setError(result.error || "Google sign-in failed.");
     }
   };
@@ -48,14 +48,38 @@ export default function LoginPage() {
   const handleDemoLogin = async () => {
     setIsLoading(true);
     setError("");
-    await signup({
-      name: "Demo User",
-      email: "demo@transformai.com",
-      password: "demo123",
-      organization: "TransformAI Demo",
+    // Try to sign up a demo user — if already exists, just sign in
+    const demoEmail = "demo@transformai.app";
+    const demoPassword = "TransformAIDemo2024!";
+
+    // First try to sign up
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: demoEmail,
+      password: demoPassword,
+      options: {
+        data: {
+          full_name: "Demo User",
+          organization: "TransformAI Demo",
+        },
+        // Skip email confirmation for demo
+      },
     });
+
+    // If signup failed because user exists, just sign in
+    if (signUpError) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: demoEmail,
+        password: demoPassword,
+      });
+
+      if (signInError) {
+        setIsLoading(false);
+        setError("Demo mode unavailable. Please create an account instead.");
+        return;
+      }
+    }
+
     setIsLoading(false);
-    await new Promise((r) => setTimeout(r, 100));
     router.push("/app");
   };
 
@@ -74,9 +98,13 @@ export default function LoginPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
               <Zap className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">TransformAI</span>
+            <span className="text-xl font-bold text-gray-900">
+              TransformAI
+            </span>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Welcome back
+          </h1>
           <p className="text-sm text-gray-500">
             Sign in to your transformation workspace.
           </p>

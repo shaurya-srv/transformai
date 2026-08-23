@@ -4,9 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { Zap, ArrowRight, Eye, EyeOff, Loader2, Check } from "lucide-react";
+import { Zap, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 
-function getPasswordStrength(password: string): { score: number; label: string; color: string } {
+function getPasswordStrength(password: string): {
+  score: number;
+  label: string;
+  color: string;
+} {
   let score = 0;
   if (password.length >= 8) score++;
   if (password.length >= 12) score++;
@@ -33,6 +37,7 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const strength = getPasswordStrength(form.password);
@@ -40,6 +45,7 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
     if (!form.name || !form.email || !form.password) {
       setError("Please fill in all required fields.");
@@ -68,7 +74,11 @@ export default function SignupPage() {
     setIsLoading(false);
 
     if (result.success) {
-      router.push("/app");
+      setSuccess(
+        "Account created! Check your email for a confirmation link. You can also try signing in now."
+      );
+      // Redirect to login after a short delay
+      setTimeout(() => router.push("/login"), 2000);
     } else {
       setError(result.error || "Signup failed.");
     }
@@ -78,10 +88,9 @@ export default function SignupPage() {
     setError("");
     setIsLoading(true);
     const result = await loginWithGoogle();
-    setIsLoading(false);
-    if (result.success) {
-      router.push("/app");
-    } else {
+    // Google OAuth triggers a redirect
+    if (!result.success) {
+      setIsLoading(false);
       setError(result.error || "Google sign-in failed.");
     }
   };
@@ -103,9 +112,13 @@ export default function SignupPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
               <Zap className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">TransformAI</span>
+            <span className="text-xl font-bold text-gray-900">
+              TransformAI
+            </span>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Create your account</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Create your account
+          </h1>
           <p className="text-sm text-gray-500">
             Start transforming information into communication.
           </p>
@@ -115,6 +128,12 @@ export default function SignupPage() {
           {error && (
             <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600 animate-fade-in">
               {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-emerald-600 animate-fade-in">
+              {success}
             </div>
           )}
 
@@ -174,7 +193,11 @@ export default function SignupPage() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
               </button>
             </div>
             {form.password && (
@@ -186,12 +209,17 @@ export default function SignupPage() {
                       className="h-1 flex-1 rounded-full transition-colors"
                       style={{
                         background:
-                          i <= strength.score ? strength.color : "rgba(0,0,0,0.08)",
+                          i <= strength.score
+                            ? strength.color
+                            : "rgba(0,0,0,0.08)",
                       }}
                     />
                   ))}
                 </div>
-                <span className="text-[10px] font-medium" style={{ color: strength.color }}>
+                <span
+                  className="text-[10px] font-medium"
+                  style={{ color: strength.color }}
+                >
                   {strength.label}
                 </span>
               </div>
@@ -220,9 +248,13 @@ export default function SignupPage() {
             />
             <span className="text-xs text-gray-500 leading-relaxed">
               I agree to the{" "}
-              <span className="text-blue-600 hover:text-blue-700 font-medium">Terms of Service</span>{" "}
+              <span className="text-blue-600 hover:text-blue-700 font-medium">
+                Terms of Service
+              </span>{" "}
               and{" "}
-              <span className="text-blue-600 hover:text-blue-700 font-medium">Privacy Policy</span>
+              <span className="text-blue-600 hover:text-blue-700 font-medium">
+                Privacy Policy
+              </span>
             </span>
           </label>
 

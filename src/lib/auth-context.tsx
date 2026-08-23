@@ -8,6 +8,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
+import { supabase } from "./supabase";
 
 export interface User {
   id: string;
@@ -23,7 +24,10 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<{ success: boolean; error?: string }>;
   loginWithGoogle: () => Promise<{ success: boolean; error?: string }>;
   signup: (data: {
     name: string;
@@ -31,36 +35,31 @@ interface AuthContextType {
     password: string;
     organization?: string;
   }) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
-  resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
+  resetPassword: (
+    email: string
+  ) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const SESSION_KEY = "transformai_session";
-const USERS_KEY = "transformai_users";
-
-function getUsers(): Record<string, { user: User; password: string }> {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(localStorage.getItem(USERS_KEY) || "{}");
-  } catch {
-    return {};
-  }
-}
-
-function saveUsers(users: Record<string, { user: User; password: string }>) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-function hashPassword(password: string): string {
-  let hash = 0;
-  for (let i = 0; i < password.length; i++) {
-    const char = password.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash).toString(36);
+function supabaseUserToUser(supabaseUser: Record<string, unknown>): User {
+  const meta = (supabaseUser.user_metadata || {}) as Record<string, string>;
+  return {
+    id: supabaseUser.id as string,
+    email: (supabaseUser.email as string) || "",
+    name:
+      meta.full_name ||
+      meta.name ||
+      (supabaseUser.email as string)?.split("@")[0] ||
+      "User",
+    organization: meta.organization || "",
+    avatar: meta.avatar_url || "",
+    createdAt: (supabaseUser.created_at as string) || new Date().toISOString(),
+    provider:
+      ((supabaseUser.app_metadata as Record<string, unknown>)?.provider as
+        "google" | "credentials") || "credentials",
+  };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -74,56 +73,139 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: false,
   });
 
-  // Restore session on mount
+  // Listen for auth state changes
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(SESSION_KEY);
-      if (saved) {
-        const user = JSON.parse(saved) as User;
-        setState({ user, isLoading: false, isAuthenticated: true });
-      } else {
-        setState({ user: null, isLoading: false, isAuthenticated: false });
+  let mounted = true;
+
+  const loadSession = async () => {
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error) {
+      console.error("Error getting session:", error);
+      if (mounted) {
+        setState({
+          user: null,
+          isLoading: false,
+          isAuthenticated: false,
+        });
       }
-    } catch {
-      setState({ user: null, isLoading: false, isAuthenticated: false });
-    }
-  }, []);
-
-  const login = useCallback(async (email: string, password: string) => {
-    await new Promise((r) => setTimeout(r, 600));
-
-    const users = getUsers();
-    const record = users[email.toLowerCase()];
-
-    if (!record) {
-      return { success: false, error: "No account found with this email address." };
+      return;
     }
 
-    if (record.password !== hashPassword(password)) {
-      return { success: false, error: "Incorrect password. Please try again." };
-    }
+    const session = data.session;
 
-    const sessionUser = { ...record.user, provider: "credentials" as const };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
-    setState({ user: sessionUser, isLoading: false, isAuthenticated: true });
-    return { success: true };
-  }, []);
+    if (session?.user && mounted) {
+      const authUser: User = {
+        id: session.user.id,
+        email: session.user.email ?? "",
+        name:
+          session.user.user_metadata?.full_name ??
+          session.user.user_metadata?.name ??
+          session.user.email?.split("@")[0] ??
+          "User",
+        avatar: session.user.user_metadata?.avatar_url,
+        createdAt: session.user.created_at,
+        provider: "google",
+      };
+
+      setState({
+        user: authUser,
+        isLoading: false,
+        isAuthenticated: true,
+      });
+    } else if (mounted) {
+      setState({
+        user: null,
+        isLoading: false,
+        isAuthenticated: false,
+      });
+    }
+  };
+
+  loadSession();
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    if (session?.user) {
+      const authUser: User = {
+        id: session.user.id,
+        email: session.user.email ?? "",
+        name:
+          session.user.user_metadata?.full_name ??
+          session.user.user_metadata?.name ??
+          session.user.email?.split("@")[0] ??
+          "User",
+        avatar: session.user.user_metadata?.avatar_url,
+        createdAt: session.user.created_at,
+        provider:
+          (session.user.app_metadata?.provider as "google" | "credentials") ||
+          "credentials",
+      };
+
+      setState({
+        user: authUser,
+        isLoading: false,
+        isAuthenticated: true,
+      });
+    } else {
+      setState({
+        user: null,
+        isLoading: false,
+        isAuthenticated: false,
+      });
+    }
+  });
+
+  return () => {
+    mounted = false;
+    subscription.unsubscribe();
+  };
+}, []);
+
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        // If user doesn't exist, offer a more helpful message
+        if (error.message.includes("Invalid login")) {
+          return {
+            success: false,
+            error: "Invalid email or password. Please try again or create an account.",
+          };
+        }
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    },
+    []
+  );
 
   const loginWithGoogle = useCallback(async () => {
-    // Simulate Google OAuth — creates/uses a Google-authenticated user
-    await new Promise((r) => setTimeout(r, 800));
-
-    const googleUser: User = {
-      id: `ggl_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      email: "user@gmail.com",
-      name: "Google User",
-      createdAt: new Date().toISOString(),
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-    };
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
 
-    localStorage.setItem(SESSION_KEY, JSON.stringify(googleUser));
-    setState({ user: googleUser, isLoading: false, isAuthenticated: true });
-    return { success: true };
+    if (error) {
+      console.error("Google login error:", error);
+
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: true,
+    };
   }, []);
 
   const signup = useCallback(
@@ -133,45 +215,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password: string;
       organization?: string;
     }) => {
-      await new Promise((r) => setTimeout(r, 600));
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.name,
+            organization: data.organization || "",
+          },
+        },
+      });
 
-      const users = getUsers();
-      if (users[data.email.toLowerCase()]) {
-        return { success: false, error: "An account with this email already exists." };
+      if (error) {
+        if (error.message.includes("already registered")) {
+          return {
+            success: false,
+            error: "An account with this email already exists. Try signing in instead.",
+          };
+        }
+        return { success: false, error: error.message };
       }
 
-      const user: User = {
-        id: `usr_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-        email: data.email.toLowerCase(),
-        name: data.name,
-        organization: data.organization,
-        createdAt: new Date().toISOString(),
-      };
-
-      users[data.email.toLowerCase()] = {
-        user,
-        password: hashPassword(data.password),
-      };
-      saveUsers(users);
-
-      localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-      setState({ user, isLoading: false, isAuthenticated: true });
       return { success: true };
     },
     []
   );
 
-  const logout = useCallback(() => {
-    localStorage.removeItem(SESSION_KEY);
-    setState({ user: null, isLoading: false, isAuthenticated: false });
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut();
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
-    await new Promise((r) => setTimeout(r, 600));
-    const users = getUsers();
-    if (!users[email.toLowerCase()]) {
-      return { success: false, error: "No account found with this email address." };
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/login`,
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
     }
+
     return { success: true };
   }, []);
 
