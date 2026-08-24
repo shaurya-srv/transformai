@@ -22,7 +22,14 @@ import {
   Loader2,
   Menu,
   X,
+  BarChart3,
+  HelpCircle,
 } from "lucide-react";
+import CommandPalette from "@/components/CommandPalette";
+import KeyboardShortcuts from "@/components/KeyboardShortcuts";
+import MobileBottomNav from "@/components/MobileBottomNav";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import OnboardingTour, { useOnboarding } from "@/components/OnboardingTour";
 
 const navItems = [
   { href: "/app", label: "Overview", icon: LayoutDashboard, exact: true },
@@ -31,6 +38,7 @@ const navItems = [
   { href: "/app/history", label: "History", icon: Clock },
   { href: "/app/templates", label: "Templates", icon: Layers },
   { href: "/app/saved", label: "Saved Outputs", icon: Star },
+  { href: "/app/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/app/settings", label: "Settings", icon: Settings },
 ];
 
@@ -82,7 +90,7 @@ function Sidebar({
             >
               <item.icon
                 className={cn(
-                  "w-4.5 h-4.5 shrink-0",
+                  "w-4 h-4 shrink-0",
                   isActive ? "text-violet-400" : "text-gray-500"
                 )}
               />
@@ -124,10 +132,16 @@ function Sidebar({
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <>
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden" onClick={onMobileClose} />
+          <div
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+            onClick={onMobileClose}
+          />
           <aside className="fixed left-0 top-0 h-screen w-[260px] bg-[#0a0a0f]/95 backdrop-blur-xl border-r border-white/5 z-50 lg:hidden shadow-xl">
             <div className="flex items-center justify-end px-3 pt-3">
-              <button onClick={onMobileClose} className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100">
+              <button
+                onClick={onMobileClose}
+                className="p-1.5 rounded-lg text-gray-400 hover:bg-white/5"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -139,7 +153,13 @@ function Sidebar({
   );
 }
 
-function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
+function TopBar({
+  onMenuToggle,
+  onOpenShortcuts,
+}: {
+  onMenuToggle: () => void;
+  onOpenShortcuts: () => void;
+}) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [showProfile, setShowProfile] = useState(false);
@@ -147,22 +167,6 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
   const [showSearch, setShowSearch] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Keyboard shortcut: Cmd/Ctrl+K opens search
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setShowSearch(true);
-      }
-      if (e.key === "Escape") {
-        setShowSearch(false);
-        setShowHelp(false);
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, []);
 
   const notifications = [
     { id: 1, text: "Transformation completed: Cybersecurity Advisory", time: "2m ago", unread: true },
@@ -177,6 +181,7 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
     { label: "Browse Templates", action: () => { router.push("/app/templates"); setShowSearch(false); } },
     { label: "Transformation History", action: () => { router.push("/app/history"); setShowSearch(false); } },
     { label: "Saved Outputs", action: () => { router.push("/app/saved"); setShowSearch(false); } },
+    { label: "Analytics", action: () => { router.push("/app/analytics"); setShowSearch(false); } },
     { label: "Settings", action: () => { router.push("/app/settings"); setShowSearch(false); } },
   ];
 
@@ -195,7 +200,6 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
         <Menu className="w-5 h-5" />
       </button>
 
-      {/* Left spacer */}
       <div className="flex-1" />
 
       {/* Center: Search bar */}
@@ -212,7 +216,6 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
         </button>
       </div>
 
-      {/* Right spacer */}
       <div className="flex-1" />
 
       {/* Right: Icons */}
@@ -220,7 +223,7 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
         {/* Notifications */}
         <div className="relative">
           <button
-            onClick={() => { setShowNotifications(!showNotifications); setShowProfile(false); }}
+            onClick={() => { setShowNotifications(!showNotifications); setShowProfile(false); setShowHelp(false); }}
             className="relative p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
           >
             <Bell className="w-4 h-4" />
@@ -255,10 +258,10 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
         {/* Help */}
         <div className="relative">
           <button
-            onClick={() => { setShowHelp(!showHelp); setShowProfile(false); }}
-            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors text-sm font-medium"
+            onClick={() => { setShowHelp(!showHelp); setShowProfile(false); setShowNotifications(false); }}
+            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
           >
-            ?
+            <HelpCircle className="w-4 h-4" />
           </button>
           {showHelp && (
             <>
@@ -269,13 +272,13 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
                   <button onClick={() => { router.push("/app/transform"); setShowHelp(false); }} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
                     🚀 Quick Start Guide
                   </button>
-                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
-                    📖 Documentation
+                  <button onClick={() => { router.push("/app/templates"); setShowHelp(false); }} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
+                    📖 Browse Templates
                   </button>
-                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
-                    💬 Contact Support
+                  <button onClick={() => { router.push("/app/analytics"); setShowHelp(false); }} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
+                    📊 View Analytics
                   </button>
-                  <button onClick={() => setShowHelp(false)} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
+                  <button onClick={() => { onOpenShortcuts(); setShowHelp(false); }} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
                     ⌨️ Keyboard Shortcuts
                   </button>
                 </div>
@@ -291,7 +294,7 @@ function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
         <div className="relative">
           <button
             onClick={() => { setShowProfile(!showProfile); setShowNotifications(false); setShowHelp(false); }}
-            className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-lg hover:bg-white/5 transition-colors"
           >
             <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
               <span className="text-[10px] font-bold text-white">
@@ -389,6 +392,34 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const { showTour, completeTour } = useOnboarding();
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Cmd/Ctrl + K — Command palette
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setShowCommandPalette((p) => !p);
+      }
+      // ? — Keyboard shortcuts
+      if (e.key === "?" && !e.ctrlKey && !e.metaKey) {
+        const target = e.target as HTMLElement;
+        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+        e.preventDefault();
+        setShowShortcuts(true);
+      }
+      // Escape
+      if (e.key === "Escape") {
+        setShowCommandPalette(false);
+        setShowShortcuts(false);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -417,15 +448,38 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
       />
-      <TopBar onMenuToggle={() => setMobileOpen(!mobileOpen)} />
+      <TopBar
+        onMenuToggle={() => setMobileOpen(!mobileOpen)}
+        onOpenShortcuts={() => setShowShortcuts(true)}
+      />
       <main
         className={cn(
-          "min-h-screen pt-14 pb-16 lg:pb-0 transition-all duration-300",
+          "min-h-screen pt-14 pb-20 lg:pb-0 transition-all duration-300",
           sidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-[260px]"
         )}
       >
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </main>
+
+      {/* Mobile Bottom Nav */}
+      <MobileBottomNav />
+
+      {/* Command Palette */}
+      <CommandPalette
+        open={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
+      />
+
+      {/* Keyboard Shortcuts */}
+      <KeyboardShortcuts
+        open={showShortcuts}
+        onClose={() => setShowShortcuts(false)}
+      />
+
+      {/* Onboarding Tour */}
+      {showTour && <OnboardingTour onComplete={completeTour} />}
     </div>
   );
 }

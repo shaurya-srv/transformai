@@ -46,6 +46,9 @@ import {
 } from "@/lib/consistencyEngine";
 import { supabase } from "@/lib/supabase";
 import { playCompletionFanfare } from "@/lib/sounds";
+import { exportToPdf, exportLinkedInPdf, exportTwitterPdf } from "@/lib/pdfExport";
+import { extractTextFromFile } from "@/lib/documentParser";
+import VersionHistory, { useVersionHistory } from "@/components/VersionHistory";
 
 // ── Step Indicator ───────────────────────────────────────────────────────
 const steps = [
@@ -106,7 +109,7 @@ const outputFormats = [
   { id: "linkedin", name: "LinkedIn Post", icon: Share2, desc: "Professional publication-ready post", category: "Social", color: "#0a66c2" },
   { id: "twitter", name: "X / Twitter Thread", icon: MessageSquare, desc: "Optimized post or thread", category: "Social", color: "#1e293b" },
   { id: "advisory", name: "Advisory", icon: Shield, desc: "Structured professional advisory", category: "Documents", color: "#f59e0b" },
-  { id: "executive", name: "Executive Summary", icon: FileText, Mic, Globe, desc: "Concise leadership briefing", category: "Documents", color: "#06b6d4" },
+  { id: "executive", name: "Executive Summary", icon: FileText, desc: "Concise leadership briefing", category: "Documents", color: "#06b6d4" },
   { id: "presentation", name: "Presentation", icon: Presentation, desc: "Slides + speaker notes", category: "Visual", color: "#8b5cf6" },
   { id: "infographic", name: "Infographic", icon: Image, desc: "Content hierarchy & visual spec", category: "Visual", color: "#10b981" },
   { id: "video", name: "Video Package", icon: Video, desc: "Script, storyboard & narration", category: "Media", color: "#ef4444" },
@@ -329,6 +332,48 @@ function ConsistencyDisplay({ result }: { result: ConsistencyResult }) {
   );
 }
 
+// ── Version History Wrapper ──────────────────────────────────────────────
+function VersionHistoryWrapper({
+  results,
+  activeResultTab,
+  setResults,
+}: {
+  results: GeneratedOutput[];
+  activeResultTab: string;
+  setResults: React.Dispatch<React.SetStateAction<GeneratedOutput[] | null>>;
+}) {
+  const active = results.find((o) => o.format === activeResultTab);
+  if (!active) return null;
+
+  // Track versions per output format
+  const [versionMap, setVersionMap] = useState<
+    Record<string, { version: number; content: string; title: string; timestamp: string }[]>
+  >({});
+
+  const versions = versionMap[activeResultTab] || [
+    { version: 1, content: active.content, title: active.title, timestamp: new Date().toLocaleTimeString() },
+  ];
+
+  const currentVersion = versions.length;
+
+  return (
+    <VersionHistory
+      versions={versions}
+      currentVersion={currentVersion}
+      onSelect={(v) => {
+        const ver = versions.find((x) => x.version === v);
+        if (ver) {
+          setResults((prev) =>
+            prev?.map((o) =>
+              o.format === activeResultTab ? { ...o, content: ver.content, title: ver.title } : o
+            ) || null
+          );
+        }
+      }}
+    />
+  );
+}
+
 // ── Main Transform Page ──────────────────────────────────────────────────
 export default function TransformPage() {
   const { toast } = useToast();
@@ -422,7 +467,7 @@ export default function TransformPage() {
     }
   };
 
-  const handleFileUpload = (files: FileList | null) => {
+  const handleFileUpload = async (files: FileList | null) => {
     if (!files) return;
     const newFiles = Array.from(files).map((f) => ({
       name: f.name,
@@ -432,22 +477,19 @@ export default function TransformPage() {
     }));
     setUploadedFiles((prev) => [...prev, ...newFiles]);
 
-    // Extract text content from files
-    Array.from(files).forEach((file) => {
-      if (file.type === "text/plain" || file.name.endsWith(".txt")) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const text = e.target?.result as string;
-          setSourceContent((prev) => (prev ? prev + "\n\n" + text : text));
-        };
-        reader.readAsText(file);
-      } else {
-        // For non-text files, add a placeholder description
-        const desc = `[${file.type || "Document"}] ${file.name} (${(file.size / 1024).toFixed(1)} KB)\n\nThis ${file.type.split("/")[0]} file has been uploaded. In a production environment, the content would be extracted using OCR (for images), PDF parsing, or document processing APIs.`;
-        setSourceContent((prev) => (prev ? prev + "\n\n" + desc : desc));
+    // Extract text content from files using the parser
+    try {
+      const extractedTexts: string[] = [];
+      for (const file of Array.from(files)) {
+        const text = await extractTextFromFile(file);
+        extractedTexts.push(text);
       }
-    });
-    toast(`${files.length} file(s) uploaded. Content extracted.`, "success");
+      const combined = extractedTexts.join("\n\n");
+      setSourceContent((prev) => (prev ? prev + "\n\n" + combined : combined));
+      toast(`${files.length} file(s) uploaded. Text extracted successfully.`, "success");
+    } catch {
+      toast(`Files uploaded but text extraction failed.`, "error");
+    }
   };
 
   const removeUploadedFile = (index: number) => {
@@ -815,15 +857,16 @@ export default function TransformPage() {
       } else if (output.format === "video") {
         await generateVideo(output.title, output.content);
         toast("Downloaded as .webm");
+      } else if (output.format === "linkedin") {
+        exportLinkedInPdf(output.title, output.content);
+        toast("Downloaded as PDF", "success");
+      } else if (output.format === "twitter") {
+        exportTwitterPdf(output.title, output.content);
+        toast("Downloaded as PDF", "success");
       } else {
-        const blob = new Blob([output.content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${output.title.replace(/[^a-zA-Z0-9]/g, "_")}.txt`;
-        a.click();
-        URL.revokeObjectURL(url);
-        toast("Downloaded as .txt");
+        // Advisory, Executive, Briefing — all export as formatted PDF
+        await exportToPdf(output.title, output.content);
+        toast("Downloaded as PDF", "success");
       }
     } catch {
       toast("Export failed", "error");
@@ -924,7 +967,7 @@ export default function TransformPage() {
           <StepIndicator current={1} />
           <div className="flex gap-2 mb-4">
             {([
-              { id: "text" as const, icon: FileText, Mic, Globe, label: "Text" },
+              { id: "text" as const, icon: FileText, label: "Text" },
               { id: "url" as const, icon: Link2, label: "URL" },
               { id: "document" as const, icon: Upload, label: "Document" },
               { id: "media" as const, icon: Image, label: "Media" },
@@ -1565,6 +1608,11 @@ export default function TransformPage() {
 
               {consistencyResult && (
                 <ConsistencyDisplay result={consistencyResult} />
+              )}
+
+              {/* Version History */}
+              {results && results.length > 0 && (
+                <VersionHistoryWrapper results={results} activeResultTab={activeResultTab} setResults={setResults} />
               )}
 
               {/* Impact Metrics */}

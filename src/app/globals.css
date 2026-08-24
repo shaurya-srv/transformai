@@ -380,3 +380,82 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* ── Light Theme ──────────────────────────────────────────────────── */
+.light-theme {
+  --color-background: #f8fafc;
+  --color-foreground: #1e293b;
+  background: #f8fafc;
+  color: #1e293b;
+}
+.light-theme .bg-\[\#0a0a0f\],
+.light-theme .bg-\[\#0a0a0f\]/90,
+.light-theme .bg-\[\#0a0a0f\]/95,
+.light-theme .bg-\[\#0a0a0f\]/80 {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.light-theme .bg-\[\#12121a\] {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+.light-theme .text-white {
+  color: #1e293b !important;
+}
+.light-theme .text-gray-300,
+.light-theme .text-gray-400 {
+  color: #475569 !important;
+}
+.light-theme .text-gray-500,
+.light-theme .text-gray-600 {
+  color: #94a3b8 !important;
+}
+.light-theme .border-white\/5,
+.light-theme .border-white\/8,
+.light-theme .border-white\/10,
+.light-theme .border-white\/12,
+.light-theme .border-white\/12 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+.light-theme .bg-white\/\[0\.04\],
+.light-theme .bg-white\/\[0\.06\],
+.light-theme .bg-white\/5,
+.light-theme .bg-white\/\[0\.03\],
+.light-theme .bg-white\/\[0\.02\] {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+.light-theme .grid-bg {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.light-theme .noise::before {
+  opacity: 0.02;
+}
+.light-theme pre,
+.light-theme code {
+  color: #334155 !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+.light-theme textarea,
+.light-theme input,
+.light-theme select {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #1e293b !important;
+}
+.light-theme textarea::placeholder,
+.light-theme input::placeholder {
+  color: #94a3b8 !important;
+}
+.light-theme .shadow-xl,
+.light-theme .shadow-2xl {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ── Safe area for mobile bottom nav ──────────────────────────────── */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

@@ -1,0 +1,317 @@
+import jsPDF from "jspdf";
+
+/**
+ * Export any text output as a formatted PDF file.
+ * Works for Advisory, Executive Summary, Briefing, and other document formats.
+ */
+export async function exportToPdf(
+  title: string,
+  content: string,
+  filename?: string
+): Promise<void> {
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 20;
+  const contentWidth = pageWidth - margin * 2;
+  let yPos = margin;
+
+  // Helper to check if we need a new page
+  const checkNewPage = (needed: number) => {
+    if (yPos + needed > pageHeight - margin) {
+      doc.addPage();
+      yPos = margin;
+    }
+  };
+
+  // Title
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(139, 92, 246); // violet
+  const titleLines = doc.splitTextToSize(title, contentWidth);
+  for (const line of titleLines) {
+    checkNewPage(10);
+    doc.text(line, margin, yPos);
+    yPos += 8;
+  }
+
+  // Separator line
+  yPos += 4;
+  doc.setDrawColor(139, 92, 246);
+  doc.setLineWidth(0.5);
+  doc.line(margin, yPos, pageWidth - margin, yPos);
+  yPos += 8;
+
+  // Content
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.setTextColor(51, 51, 51); // dark gray
+
+  const lines = content.split("\n");
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    // Detect section headers (ALL CAPS lines, lines ending with colon, etc.)
+    const isHeader =
+      (trimmed === trimmed.toUpperCase() && trimmed.length > 3 && /^[A-Z\s\-:]+$/.test(trimmed)) ||
+      /^SLIDE\s+\d+/i.test(trimmed) ||
+      /^━━━/.test(trimmed) ||
+      /^╔═|^║/.test(trimmed);
+
+    const isSubHeader =
+      /^(?:ADVISORY|SEVERITY|DATE|STATUS|TITLE|SITUATION|AFFECTED|IMPACT|RECOMMENDED|REFERENCES|POINT OF CONTACT|SPEAKER NOTES|HEADLINE|SUBTITLE|SECTION|DESIGN|KEY|STATS|WHAT|HOW|WHEN|WHERE|WHO|WHY)/i.test(trimmed);
+
+    if (/^━━━/.test(trimmed) || /^╔═/.test(trimmed)) {
+      // Separator
+      yPos += 3;
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.2);
+      doc.line(margin, yPos, pageWidth - margin, yPos);
+      yPos += 5;
+      continue;
+    }
+
+    if (/^║/.test(trimmed)) {
+      // Box decoration — skip
+      continue;
+    }
+
+    if (isHeader) {
+      checkNewPage(14);
+      yPos += 4;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(139, 92, 246);
+      const headerLines = doc.splitTextToSize(trimmed.replace(/^━+$/, ""), contentWidth);
+      for (const hl of headerLines) {
+        checkNewPage(8);
+        doc.text(hl, margin, yPos);
+        yPos += 6;
+      }
+      yPos += 3;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.setTextColor(51, 51, 51);
+      continue;
+    }
+
+    if (isSubHeader) {
+      checkNewPage(12);
+      yPos += 2;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(80, 80, 80);
+      doc.text(trimmed, margin, yPos);
+      yPos += 6;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.setTextColor(51, 51, 51);
+      continue;
+    }
+
+    // Bullet points
+    if (/^[•●○▪▶→►☑□✓✗❌]/.test(trimmed) || /^[-*]\s/.test(trimmed)) {
+      checkNewPage(8);
+      const bulletText = trimmed.replace(/^[•●○▪▶→►☑□✓✗❌\-*]\s*/, "");
+      const bulletLines = doc.splitTextToSize(`  •  ${bulletText}`, contentWidth - 4);
+      for (const bl of bulletLines) {
+        checkNewPage(6);
+        doc.text(bl, margin + 2, yPos);
+        yPos += 5;
+      }
+      yPos += 1;
+      continue;
+    }
+
+    // Numbered items
+    if (/^\d+[.)]\s/.test(trimmed)) {
+      checkNewPage(8);
+      const numLines = doc.splitTextToSize(trimmed, contentWidth - 4);
+      for (const nl of numLines) {
+        checkNewPage(6);
+        doc.text(nl, margin + 2, yPos);
+        yPos += 5;
+      }
+      yPos += 1;
+      continue;
+    }
+
+    // Checkbox items
+    if (/^[□☑✓✗]\s/.test(trimmed)) {
+      checkNewPage(8);
+      const cbLines = doc.splitTextToSize(`  ${trimmed}`, contentWidth - 4);
+      for (const cl of cbLines) {
+        checkNewPage(6);
+        doc.text(cl, margin + 2, yPos);
+        yPos += 5;
+      }
+      yPos += 1;
+      continue;
+    }
+
+    // Empty line
+    if (trimmed === "") {
+      yPos += 4;
+      continue;
+    }
+
+    // Regular text
+    const textLines = doc.splitTextToSize(trimmed, contentWidth);
+    for (const tl of textLines) {
+      checkNewPage(6);
+      doc.text(tl, margin, yPos);
+      yPos += 5;
+    }
+  }
+
+  // Footer on every page
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(
+      `Generated by TransformAI — One Source. Infinite Communication.`,
+      margin,
+      pageHeight - 10
+    );
+    doc.text(
+      `Page ${i} of ${totalPages}`,
+      pageWidth - margin - 20,
+      pageHeight - 10
+    );
+  }
+
+  const safeFilename = (filename || title || "transformai-output")
+    .replace(/[^a-zA-Z0-9\s\-_]/g, "")
+    .replace(/\s+/g, "_")
+    .substring(0, 80);
+
+  doc.save(`${safeFilename}.pdf`);
+}
+
+/**
+ * Export LinkedIn post as a styled PDF
+ */
+export function exportLinkedInPdf(title: string, content: string): void {
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 25;
+  const contentWidth = pageWidth - margin * 2;
+  let yPos = margin;
+
+  // LinkedIn-style header
+  doc.setFillColor(10, 102, 194); // LinkedIn blue
+  doc.rect(0, 0, pageWidth, 45, "F");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.setTextColor(255, 255, 255);
+  doc.text("LinkedIn Post", margin, 20);
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+  doc.text("Ready to publish", margin, 32);
+
+  yPos = 55;
+
+  // Content
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.setTextColor(51, 51, 51);
+
+  const lines = content.split("\n");
+  for (const line of lines) {
+    if (yPos > doc.internal.pageSize.getHeight() - margin) {
+      doc.addPage();
+      yPos = margin;
+    }
+
+    if (line.trim() === "") {
+      yPos += 4;
+      continue;
+    }
+
+    const textLines = doc.splitTextToSize(line, contentWidth);
+    for (const tl of textLines) {
+      doc.text(tl, margin, yPos);
+      yPos += 5;
+    }
+  }
+
+  // Footer
+  doc.setFontSize(8);
+  doc.setTextColor(150, 150, 150);
+  doc.text("Generated by TransformAI", margin, doc.internal.pageSize.getHeight() - 10);
+
+  doc.save("linkedin_post.pdf");
+}
+
+/**
+ * Export Twitter/X thread as PDF
+ */
+export function exportTwitterPdf(title: string, content: string): void {
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 25;
+  const contentWidth = pageWidth - margin * 2;
+  let yPos = margin;
+
+  // X/Twitter header
+  doc.setFillColor(30, 41, 59);
+  doc.rect(0, 0, pageWidth, 40, "F");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(255, 255, 255);
+  doc.text("X / Twitter Thread", margin, 22);
+
+  yPos = 52;
+
+  // Content
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.setTextColor(51, 51, 51);
+
+  const lines = content.split("\n");
+  for (const line of lines) {
+    if (yPos > doc.internal.pageSize.getHeight() - margin) {
+      doc.addPage();
+      yPos = margin;
+    }
+
+    if (line.trim() === "") {
+      yPos += 4;
+      continue;
+    }
+
+    const textLines = doc.splitTextToSize(line, contentWidth);
+    for (const tl of textLines) {
+      doc.text(tl, margin, yPos);
+      yPos += 5;
+    }
+  }
+
+  doc.setFontSize(8);
+  doc.setTextColor(150, 150, 150);
+  doc.text("Generated by TransformAI", margin, doc.internal.pageSize.getHeight() - 10);
+
+  doc.save("twitter_thread.pdf");
+}
