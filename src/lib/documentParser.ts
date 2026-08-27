@@ -17,7 +17,7 @@ export async function extractPdfText(file: File): Promise<string> {
 
         // Try using pdf.js if available
         try {
-          const pdfjsLib = await import("pdfjs-dist");
+          const pdfjsLib = await (Function("return import(\"pdfjs-dist\")")() as Promise<any>);
           const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
           const textParts: string[] = [];
 

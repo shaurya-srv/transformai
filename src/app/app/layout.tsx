@@ -24,6 +24,7 @@ import {
   X,
   BarChart3,
   HelpCircle,
+  Shield,
 } from "lucide-react";
 import CommandPalette from "@/components/CommandPalette";
 import KeyboardShortcuts from "@/components/KeyboardShortcuts";
@@ -39,6 +40,7 @@ const navItems = [
   { href: "/app/templates", label: "Templates", icon: Layers },
   { href: "/app/saved", label: "Saved Outputs", icon: Star },
   { href: "/app/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/app/security", label: "Security", icon: Shield },
   { href: "/app/settings", label: "Settings", icon: Settings },
 ];
 
