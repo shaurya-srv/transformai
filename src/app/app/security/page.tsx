@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, Link2, Scale, AlertTriangle, CheckCircle, Database, Lock } from "lucide-react";
+import { Shield, Link2, Scale, AlertTriangle, CheckCircle, Database, Lock, FileCheck, ShieldAlert, AlertOctagon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ThreatAnalysisPanel from "@/components/ThreatAnalysisPanel";
 import BlockchainVerification from "@/components/BlockchainVerification";
 import ComplianceBadge from "@/components/ComplianceBadge";
+import MultiSigApproval from "@/components/MultiSigApproval";
+import DLPScannerPanel from "@/components/DLPScanner";
+import IncidentResponsePanel from "@/components/IncidentResponse";
 import { getChainStats, getRecentBlocks } from "@/lib/blockchain";
 
 const sampleContent = `SECURITY ADVISORY: CVE-2024-38816 - Critical VPN Vulnerability
@@ -32,7 +35,7 @@ Patient records at risk of exposure. Contact: security@company.com
 Credit card processing: 4532-1234-5678-9012`;
 
 export default function SecurityDashboard() {
-  const [activeTab, setActiveTab] = useState<"overview" | "threat" | "blockchain" | "compliance">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "threat" | "blockchain" | "compliance" | "multisig" | "dlp" | "incident">("overview");
   const [testContent, setTestContent] = useState(sampleContent);
   const chainStats = getChainStats();
   const recentBlocks = getRecentBlocks(5);
@@ -42,6 +45,9 @@ export default function SecurityDashboard() {
     { id: "threat" as const, label: "Threat Analysis", icon: AlertTriangle },
     { id: "blockchain" as const, label: "Blockchain", icon: Link2 },
     { id: "compliance" as const, label: "Compliance", icon: Scale },
+    { id: "multisig" as const, label: "Multi-Sig", icon: FileCheck },
+    { id: "dlp" as const, label: "DLP Scanner", icon: ShieldAlert },
+    { id: "incident" as const, label: "Incidents", icon: AlertOctagon },
   ];
 
   return (
@@ -122,6 +128,9 @@ export default function SecurityDashboard() {
       {activeTab === "threat" && <div className="animate-fade-in-up"><ThreatAnalysisPanel content={testContent} /></div>}
       {activeTab === "blockchain" && <div className="animate-fade-in-up"><BlockchainVerification content={testContent} metadata={{ type: "source" }} /></div>}
       {activeTab === "compliance" && <div className="animate-fade-in-up"><ComplianceBadge content={testContent} /></div>}
+      {activeTab === "multisig" && <div className="animate-fade-in-up"><MultiSigApproval content={testContent} contentTitle="Security Advisory" /></div>}
+      {activeTab === "dlp" && <div className="animate-fade-in-up"><DLPScannerPanel content={testContent} /></div>}
+      {activeTab === "incident" && <div className="animate-fade-in-up"><IncidentResponsePanel /></div>}
     </div>
   );
 }
